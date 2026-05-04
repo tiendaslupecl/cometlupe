@@ -63,19 +63,19 @@ def create_redirect(path: str, target: str) -> bool:
     # Idempotencia
     existing = graphql(CHECK_REDIRECT, {"query": f"path:{path}"})
     if existing["urlRedirects"]["nodes"]:
-        print(f"[SKIP] Redirect ya existe: {path}")
+        print(f"⏭️ Redirect para {path} ya existe — omitiendo")
         return False
-    
+
     result = graphql(
         CREATE_REDIRECT,
         {"urlRedirect": {"path": path, "target": target}},
     )
     errors = result["urlRedirectCreate"].get("userErrors", [])
     if errors:
-        print(f"[ERROR] {path}: {errors}")
+        print(f"❌ Redirect {path}: {errors}")
         return False
-    
-    print(f"[OK] {path} -> {target}")
+
+    print(f"✅ {path} → {target}")
     return True
 
 
@@ -85,10 +85,10 @@ def create_all_redirects() -> dict:
     all_protected = PROTECTED_HANDLES | new_handles
     
     all_collections = list_all_collections()
-    print(f"[INFO] Total colecciones encontradas: {len(all_collections)}")
-    
+    print(f"📋 Encontradas {len(all_collections)} colecciones en total")
+
     old_collections = [c for c in all_collections if c["handle"] not in all_protected]
-    print(f"   Colecciones a redirigir: {len(old_collections)}")
+    print(f"   Colecciones antiguas a redirigir: {len(old_collections)}")
     
     created = 0
     skipped = 0
@@ -109,9 +109,9 @@ def create_all_redirects() -> dict:
         
         time.sleep(0.5)
     
-    print(f"\n[STATS] Redirects: {created} creados, {skipped} ya existian")
+    print(f"\n📊 Redirects: {created} creados, {skipped} omitidos")
     if no_match:
-        print(f"[WARN] Sin mapping ({len(no_match)} colecciones, requieren revision manual):")
+        print(f"⚠️ Sin regla de mapping ({len(no_match)} colecciones):")
         for h in no_match:
             print(f"   - /collections/{h}")
     

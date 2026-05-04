@@ -16,6 +16,7 @@ COLLECTIONS = [
             "cat-cuchillos", "cat-planchas-aguja", "cat-planchas-ropa",
             "cat-accesorios-maquina", "cat-cortadoras"
         ],
+        "rule_relation": "EQUALS",
         "expected_count": 272,
         "seo_title": "Máquinas de Coser y Repuestos | Tiendas Lupe",
         "seo_description": "Compra agujas, prensatelas, repuestos y accesorios para máquina industrial y casera. Marcas premium Singer, Schmetz, Groz Beckert, Yamato.",
@@ -28,6 +29,7 @@ COLLECTIONS = [
             "cat-tijeras", "cat-alfileres", "cat-herramientas-costura",
             "cat-herramientas-marcado", "cat-herramientas-manuales"
         ],
+        "rule_relation": "EQUALS",
         "expected_count": 40,
         "seo_title": "Herramientas de Costura Profesionales | Tiendas Lupe",
         "seo_description": "Tijeras Mundial, Pin, Reach, alfileres, descosedores y herramientas de marcado. Calidad profesional para costureras y modistas.",
@@ -40,9 +42,21 @@ COLLECTIONS = [
             "cat-elasticos", "cat-cierres", "cat-broches",
             "cat-velcros", "cat-cintas-bies", "cat-cintas", "cat-entretelas"
         ],
+        # Shopify no permite TAG CONTAINS en colecciones inteligentes.
+        # Para aproximar el universo esperado (~453), complementamos tags exactos
+        # con reglas por título para hilos/insumos comunes.
         "extra_rules": [
-            {"column": "TAG", "relation": "CONTAINS", "condition": "hilo"}
+            {"column": "TAG", "relation": "EQUALS", "condition": "hilo"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "hilo"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "cierre"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "elastico"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "broche"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "velcro"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "cinta"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "bies"},
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "entretela"},
         ],
+        "rule_relation": "EQUALS",
         "expected_count": 453,
         "seo_title": "Insumos de Confección | Hilos, Elásticos, Cierres | Tiendas Lupe",
         "seo_description": "Hilos Lama, Samurai, Durafill. Elásticos, cierres, broches, velcros, cintas y entretelas. Todo para tu confección profesional.",
@@ -55,6 +69,7 @@ COLLECTIONS = [
             "cat-lanas", "cat-trapillo", "cat-bastidores",
             "cat-agujas-tejido", "cat-agujas-mano", "cat-pasamaneria"
         ],
+        "rule_relation": "EQUALS",
         "expected_count": 60,
         "seo_title": "Lanas, Trapillo y Bastidores | Tejido y Manualidades",
         "seo_description": "Lanas Modista, Lanaquil, trapillo, bastidores y todo para tejer crochet, palillo y bordar.",
@@ -64,8 +79,9 @@ COLLECTIONS = [
         "handle": "bisuteria-decoracion",
         "description": "Insumos para bisutería y proyectos decorativos: cordones SPESSO macramé, argollas metálicas, cuentas de madera, perlas, strass hotfix y cascabeles.",
         "tags": [
-            "cat-cordones", "cat-argollas", "cat-bisuteria", "cat-accesorios-metalicos"
+            "cat-cordones"
         ],
+        "rule_relation": "EQUALS",
         "expected_count": 25,
         "seo_title": "Bisutería y Cordones de Macramé | Tiendas Lupe",
         "seo_description": "Cordones SPESSO, argollas, perlas, strass y todo para bisutería y manualidades decorativas.",
@@ -74,7 +90,11 @@ COLLECTIONS = [
         "title": "Tinturas y Pegamentos",
         "handle": "tinturas-pegamentos",
         "description": "Tinturas Montblanc para teñir telas en todos los colores y pegamentos especializados Dritz para textiles y manualidades.",
-        "tags": ["cat-tinturas", "cat-pegamentos"],
+        "tags": ["cat-tinturas"],
+        "extra_rules": [
+            {"column": "TITLE", "relation": "CONTAINS", "condition": "pegamento"},
+        ],
+        "rule_relation": "EQUALS",
         "expected_count": 13,
         "seo_title": "Tinturas Montblanc y Pegamentos | Tiendas Lupe",
         "seo_description": "Anilinas Montblanc para teñir telas y ropa. Pegamentos Dritz para textiles. Calidad profesional para tus proyectos.",
@@ -86,7 +106,7 @@ COLLECTIONS = [
 # ESTRUCTURA DEL MENÚ PRINCIPAL
 # ════════════════════════════════════════════════════════════
 MENU_STRUCTURE = [
-    {"title": "Inicio", "type": "FRONTPAGE"},
+    {"title": "Inicio", "type": "FRONTPAGE", "url": "/"},
     {
         "title": "Máquinas y Repuestos",
         "type": "COLLECTION",
@@ -182,6 +202,22 @@ REDIRECT_MAP = {
     "tintura": "/collections/tinturas-pegamentos?filter.p.tag=cat-tinturas",
     "anilina": "/collections/tinturas-pegamentos?filter.p.tag=cat-tinturas",
     "pegamento": "/collections/tinturas-pegamentos?filter.p.tag=cat-pegamentos",
+    # Mapeos adicionales detectados en tienda real (colecciones sin match)
+    "top-65-favoritos": "/collections/maquinas-y-repuestos",
+    "botones": "/collections/insumos-confeccion",
+    "catalogo-completo": "/collections/maquinas-y-repuestos",
+    "hebillas": "/collections/bisuteria-decoracion?filter.p.tag=cat-argollas",
+    "ganchillo": "/collections/tejido-manualidades?filter.p.tag=cat-agujas-tejido",
+    "manualidades": "/collections/tejido-manualidades",
+    "adhesivo": "/collections/tinturas-pegamentos?filter.p.tag=cat-pegamentos",
+    "cascabel": "/collections/bisuteria-decoracion?filter.p.tag=cat-bisuteria",
+    "fleco": "/collections/tejido-manualidades?filter.p.tag=cat-pasamaneria",
+    "accesorios-maquina": "/collections/maquinas-y-repuestos?filter.p.tag=cat-accesorios-maquina",
+    "herramientas-de-costura": "/collections/herramientas-costura",
+    "herramientas": "/collections/herramientas-costura",
+    "huincha": "/collections/insumos-confeccion?filter.p.tag=cat-cintas",
+    "insumos-de-confeccion": "/collections/insumos-confeccion",
+    "tejido-y-manualidades": "/collections/tejido-manualidades",
 }
 
 # Colecciones que NO se deben redirigir (ya existentes o nuevas)

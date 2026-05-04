@@ -24,6 +24,20 @@ mutation collectionCreate($input: CollectionInput!) {
 }
 """
 
+UPDATE_COLLECTION = """
+mutation collectionUpdate($input: CollectionInput!) {
+  collectionUpdate(input: $input) {
+    collection {
+      id
+      handle
+      title
+      productsCount { count }
+    }
+    userErrors { field message }
+  }
+}
+"""
+
 CHECK_HANDLE = """
 query checkHandle($handle: String!) {
   collectionByHandle(handle: $handle) {
@@ -35,68 +49,77 @@ query checkHandle($handle: String!) {
 """
 
 
+def _build_input(c: dict, collection_id: str | None = None) -> dict:
+    rel = c.get("rule_relation", "EQUALS")
+    rules = [
+        {"column": "TAG", "relation": rel, "condition": tag}
+        for tag in c["tags"]
+    ]
+    if "extra_rules" in c:
+        rules.extend(c["extra_rules"])
+    payload = {
+        "title": c["title"],
+        "handle": c["handle"],
+        "descriptionHtml": f"<p>{c['description']}</p>",
+        "ruleSet": {
+            "appliedDisjunctively": True,
+            "rules": rules,
+        },
+        "seo": {
+            "title": c["seo_title"],
+            "description": c["seo_description"],
+        },
+    }
+    if collection_id:
+        payload["id"] = collection_id
+    return payload
+
+
+def _validate_count(c: dict) -> tuple[int, float]:
+    check = graphql(CHECK_HANDLE, {"handle": c["handle"]})
+    actual = check["collectionByHandle"]["productsCount"]["count"]
+    expected = c["expected_count"]
+    delta_pct = abs(actual - expected) / expected * 100 if expected else 0
+    status = "✅" if delta_pct <= 15 else "⚠️"
+    print(f"   {status} Productos: {actual} (esperado ~{expected}, delta {delta_pct:.1f}%)")
+    return actual, delta_pct
+
+
 def create_all_collections() -> dict:
-    """Crea las 6 colecciones, retorna {handle: id}."""
+    """Crea o actualiza las 6 colecciones, retorna {handle: id}."""
     collection_ids = {}
-    
+
     for c in COLLECTIONS:
-        # Idempotencia: ¿ya existe?
         existing = graphql(CHECK_HANDLE, {"handle": c["handle"]})
-        if existing.get("collectionByHandle"):
-            cid = existing["collectionByHandle"]["id"]
-            count = existing["collectionByHandle"]["productsCount"]["count"]
-            print(f"[SKIP] '{c['title']}' ya existe ({count} productos) - saltando")
-            collection_ids[c["handle"]] = cid
-            continue
-        
-        # Construir reglas
-        rules = [
-            {"column": "TAG", "relation": "EQUALS", "condition": tag}
-            for tag in c["tags"]
-        ]
-        if "extra_rules" in c:
-            rules.extend(c["extra_rules"])
-        
-        variables = {
-            "input": {
-                "title": c["title"],
-                "handle": c["handle"],
-                "descriptionHtml": f"<p>{c['description']}</p>",
-                "ruleSet": {
-                    "appliedDisjunctively": True,
-                    "rules": rules
-                },
-                "seo": {
-                    "title": c["seo_title"],
-                    "description": c["seo_description"]
-                },
-            }
-        }
-        
-        result = graphql(CREATE_COLLECTION, variables)
-        
-        errors = result["collectionCreate"].get("userErrors", [])
-        if errors:
-            print(f"[ERROR] Error creando '{c['title']}': {errors}")
-            continue
-        
-        col = result["collectionCreate"]["collection"]
-        collection_ids[c["handle"]] = col["id"]
-        print(f"[OK] Creada '{col['title']}'")
-        
-        time.sleep(2)  # Esperar que Shopify indexe productos
-        
-        # Validar conteo de productos
-        check = graphql(CHECK_HANDLE, {"handle": c["handle"]})
-        actual = check["collectionByHandle"]["productsCount"]["count"]
-        expected = c["expected_count"]
-        delta_pct = abs(actual - expected) / expected * 100 if expected else 0
-        
-        icon = "[OK]" if delta_pct <= 15 else "[WARN]"
-        print(f"   {icon} {actual} productos (esperado ~{expected}, delta {delta_pct:.1f}%)")
-        
-        time.sleep(1)
-    
+        current = existing.get("collectionByHandle")
+
+        if current:
+            cid = current["id"]
+            count = current["productsCount"]["count"]
+            print(f"🔄 '{c['title']}' ya existe ({cid}, {count} productos) — actualizando reglas/SEO")
+            result = graphql(UPDATE_COLLECTION, {"input": _build_input(c, cid)})
+            errors = result["collectionUpdate"].get("userErrors", [])
+            if errors:
+                print(f"❌ {c['title']} (update): {errors}")
+                collection_ids[c["handle"]] = cid
+                continue
+            col = result["collectionUpdate"]["collection"]
+            collection_ids[c["handle"]] = col["id"]
+            print(f"✅ Actualizada '{col['title']}' ({col['id']})")
+        else:
+            result = graphql(CREATE_COLLECTION, {"input": _build_input(c)})
+            errors = result["collectionCreate"].get("userErrors", [])
+            if errors:
+                print(f"❌ {c['title']} (create): {errors}")
+                continue
+            col = result["collectionCreate"]["collection"]
+            collection_ids[c["handle"]] = col["id"]
+            print(f"✅ Creada '{col['title']}' ({col['id']})")
+
+        time.sleep(5)
+        _validate_count(c)
+        time.sleep(0.5)
+
     return collection_ids
 
 

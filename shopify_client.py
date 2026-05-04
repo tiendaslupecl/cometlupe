@@ -3,12 +3,25 @@ Cliente HTTP para Shopify Admin API.
 Maneja GraphQL, REST, rate limits y reintentos.
 """
 import os
+import sys
 import time
 from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
 
+
+def _configure_stdio_utf8() -> None:
+    if sys.platform == "win32":
+        for stream in (sys.stdout, sys.stderr):
+            if hasattr(stream, "reconfigure"):
+                try:
+                    stream.reconfigure(encoding="utf-8", errors="replace")
+                except Exception:
+                    pass
+
+
+_configure_stdio_utf8()
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 _raw_shop = (os.getenv("SHOP_DOMAIN") or "").strip()
@@ -45,7 +58,7 @@ def graphql(query: str, variables: dict | None = None, max_retries: int = 3) -> 
             
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"[WAIT] Rate limit alcanzado. Esperando {wait}s...")
+                print(f"⏳ Rate limited. Esperando {wait}s...")
                 time.sleep(wait)
                 continue
             
@@ -93,7 +106,7 @@ def rest(method: str, path: str, payload: dict | None = None, max_retries: int =
             
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"[WAIT] Rate limit. Esperando {wait}s...")
+                print(f"⏳ Rate limit REST. Esperando {wait}s...")
                 time.sleep(wait)
                 continue
             
@@ -131,9 +144,9 @@ def validate_token() -> dict:
     """
     data = graphql(query)
     shop = data["shop"]
-    print("[OK] Token OK")
-    print(f"   Tienda: {shop['name']}")
-    print(f"   Dominio: {shop['myshopifyDomain']}")
-    print(f"   Plan: {shop['plan']['displayName']}")
-    print(f"   URL principal: {shop['primaryDomain']['url']}")
+    plan = shop["plan"]["displayName"]
+    print(f"✅ Token OK | Shop: {shop['name']} | Plan: {plan}")
+    dom = shop.get("primaryDomain") or {}
+    if dom.get("url"):
+        print(f"   URL principal: {dom['url']}")
     return shop

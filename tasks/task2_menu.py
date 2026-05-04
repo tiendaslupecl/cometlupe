@@ -81,9 +81,24 @@ def find_page_gid(handle: str) -> str | None:
       }
     }
     """
-    data = graphql(q, {"query": f"handle:{handle}"})
+    data = graphql(q, {"q": f"handle:{handle}"})
     nodes = data.get("pages", {}).get("nodes", [])
-    return nodes[0]["id"] if nodes else None
+    if nodes:
+        return nodes[0]["id"]
+    pid = find_page_id(handle)
+    if pid:
+        return f"gid://shopify/Page/{pid}"
+    for alt in ("contact", "contacto"):
+        if alt == handle:
+            continue
+        data = graphql(q, {"q": f"handle:{alt}"})
+        nodes = data.get("pages", {}).get("nodes", [])
+        if nodes:
+            return nodes[0]["id"]
+        pid = find_page_id(alt)
+        if pid:
+            return f"gid://shopify/Page/{pid}"
+    return None
 
 
 def _store_base_url() -> str:
@@ -135,7 +150,7 @@ def build_menu_items_graphql(structure: list, base_url: str) -> list:
     items: list = []
     for entry in structure:
         if entry["type"] == "FRONTPAGE":
-            items.append({"title": entry["title"], "type": "FRONT_PAGE", "items": []})
+            items.append({"title": entry["title"], "type": "FRONTPAGE", "items": []})
         elif entry["type"] == "COLLECTION":
             rid = find_collection_gid(entry["handle"])
             if rid is None:
@@ -178,8 +193,8 @@ def build_menu_items_graphql(structure: list, base_url: str) -> list:
 
 def rebuild_menu_rest() -> None:
     menu = find_main_menu()
-    print(f"[INFO] Menu encontrado (REST): {menu['title']} (ID: {menu['id']})")
-    print(f"   Items actuales: {len(menu.get('items', []))}")
+    print(f"📋 Menú encontrado (REST): {menu['title']} (ID: {menu['id']})")
+    print(f"   Ítems actuales: {len(menu.get('items', []))}")
 
     new_items = build_menu_items_rest(MENU_STRUCTURE)
     payload = {
@@ -192,7 +207,8 @@ def rebuild_menu_rest() -> None:
     }
     rest("PUT", f"/menus/{menu['id']}.json", payload)
     sub_count = sum(len(i.get("items", [])) for i in new_items)
-    print(f"[OK] Menu reconstruido (REST): {len(new_items)} items + {sub_count} sub-items")
+    print(f"✅ Menú reconstruido (REST): {len(new_items)} ítems de nivel superior")
+    print(f"   Sub-ítems: {sub_count}")
 
 
 def rebuild_menu_graphql() -> None:
@@ -225,9 +241,8 @@ def rebuild_menu_graphql() -> None:
         raise RuntimeError(f"menuUpdate userErrors: {errs}")
 
     sub_count = sum(len(i.get("items", [])) for i in gql_items)
-    print(
-        f"[OK] Menu reconstruido (GraphQL): {len(gql_items)} items + {sub_count} sub-items"
-    )
+    print(f"✅ Menú reconstruido (GraphQL): {len(gql_items)} ítems de nivel superior")
+    print(f"   Sub-ítems: {sub_count}")
 
 
 def rebuild_menu() -> None:
