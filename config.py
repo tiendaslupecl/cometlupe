@@ -165,7 +165,8 @@ MENU_STRUCTURE = [
         ],
     },
     {"title": "Tinturas", "type": "COLLECTION", "handle": "tinturas-pegamentos"},
-    {"title": "Contacto", "type": "PAGE", "page_handle": "contacto"},
+    # HTTP evita 404 si la página no existe o no está publicada; override con CONTACT_PAGE_PATH en .env
+    {"title": "Contacto", "type": "HTTP", "path": "/pages/contacto"},
 ]
 
 

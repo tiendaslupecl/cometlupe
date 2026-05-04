@@ -9,7 +9,7 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parent
 _LOG_FILE = _ROOT / "execution_log.json"
 
-from shopify_client import validate_token
+from shopify_client import print_store_tier_and_checklist, validate_token
 from tasks.task1_collections import create_all_collections
 from tasks.task2_menu import rebuild_menu
 from tasks.task3_redirects import create_all_redirects
@@ -38,6 +38,7 @@ def main():
     try:
         shop = validate_token()
         log["shop"] = shop
+        print_store_tier_and_checklist(shop)
     except Exception as e:
         print(f"❌ Validación de token falló: {e}")
         log["task0_error"] = str(e)

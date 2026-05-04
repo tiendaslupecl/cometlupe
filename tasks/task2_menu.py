@@ -101,6 +101,23 @@ def find_page_gid(handle: str) -> str | None:
     return None
 
 
+def _full_store_url(base_url: str, path: str) -> str:
+    path = path.strip()
+    if path.startswith("http"):
+        return path
+    if path.startswith("/"):
+        return f"{base_url}{path}"
+    return f"{base_url}/{path}"
+
+
+def _collection_submenu_tuples(entry: dict) -> list[tuple[str, str]]:
+    """Incluye «Todas las colecciones» al inicio para que el enlace del mega-menú no apunte a rutas inválidas."""
+    if not entry.get("items"):
+        return []
+    handle = entry["handle"]
+    return [("Todas las colecciones", f"/collections/{handle}"), *entry["items"]]
+
+
 def _store_base_url() -> str:
     """URL base del escaparate para enlaces HTTP (submenus)."""
     env = (os.getenv("STORE_PRIMARY_URL") or "").strip().rstrip("/")
@@ -116,7 +133,7 @@ def _store_base_url() -> str:
     return str(url).rstrip("/")
 
 
-def build_menu_items_rest(structure: list) -> list:
+def build_menu_items_rest(structure: list, base_url: str) -> list:
     items = []
     for entry in structure:
         if entry["type"] == "FRONTPAGE":
@@ -133,13 +150,21 @@ def build_menu_items_rest(structure: list) -> list:
                 print(f"[WARN] Pagina '{entry['page_handle']}' no existe, saltando")
                 continue
             item = {"title": entry["title"], "type": "page", "subject": str(pid)}
+        elif entry["type"] == "HTTP":
+            path = (os.getenv("CONTACT_PAGE_PATH") or entry.get("path") or "/").strip()
+            item = {
+                "title": entry["title"],
+                "type": "http",
+                "subject": _full_store_url(base_url, path),
+            }
         else:
             continue
 
-        if "items" in entry:
+        sub = _collection_submenu_tuples(entry)
+        if sub:
             item["items"] = [
-                {"title": title, "type": "http", "subject": url}
-                for title, url in entry["items"]
+                {"title": title, "type": "http", "subject": _full_store_url(base_url, url)}
+                for title, url in sub
             ]
         items.append(item)
     return items
@@ -162,18 +187,17 @@ def build_menu_items_graphql(structure: list, base_url: str) -> list:
                 "resourceId": rid,
                 "items": [],
             }
-            if entry.get("items"):
-                path_urls = []
-                for title, path in entry["items"]:
-                    path = path.strip()
-                    if path.startswith("http"):
-                        full = path
-                    else:
-                        full = f"{base_url}{path}" if path.startswith("/") else f"{base_url}/{path}"
-                    path_urls.append(
-                        {"title": title, "type": "HTTP", "url": full, "items": []}
-                    )
-                node["items"] = path_urls
+            sub = _collection_submenu_tuples(entry)
+            if sub:
+                node["items"] = [
+                    {
+                        "title": title,
+                        "type": "HTTP",
+                        "url": _full_store_url(base_url, path),
+                        "items": [],
+                    }
+                    for title, path in sub
+                ]
             items.append(node)
         elif entry["type"] == "PAGE":
             pid = find_page_gid(entry["page_handle"])
@@ -188,6 +212,16 @@ def build_menu_items_graphql(structure: list, base_url: str) -> list:
                     "items": [],
                 }
             )
+        elif entry["type"] == "HTTP":
+            path = (os.getenv("CONTACT_PAGE_PATH") or entry.get("path") or "/").strip()
+            items.append(
+                {
+                    "title": entry["title"],
+                    "type": "HTTP",
+                    "url": _full_store_url(base_url, path),
+                    "items": [],
+                }
+            )
     return items
 
 
@@ -196,7 +230,12 @@ def rebuild_menu_rest() -> None:
     print(f"📋 Menú encontrado (REST): {menu['title']} (ID: {menu['id']})")
     print(f"   Ítems actuales: {len(menu.get('items', []))}")
 
-    new_items = build_menu_items_rest(MENU_STRUCTURE)
+    base = _store_base_url()
+    if not base:
+        raise RuntimeError(
+            "Sin URL del escaparate para enlaces HTTP del menú. Define STORE_PRIMARY_URL en .env."
+        )
+    new_items = build_menu_items_rest(MENU_STRUCTURE, base)
     payload = {
         "menu": {
             "id": menu["id"],

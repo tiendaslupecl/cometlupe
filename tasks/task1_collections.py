@@ -1,13 +1,13 @@
 """
 Tarea 1: Crear las 6 colecciones automatizadas.
 """
+import os
 import time
 import sys
-import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from shopify_client import graphql
+from shopify_client import graphql, publish_resource_to_online_store
 from config import COLLECTIONS
 
 CREATE_COLLECTION = """
@@ -115,6 +115,14 @@ def create_all_collections() -> dict:
             col = result["collectionCreate"]["collection"]
             collection_ids[c["handle"]] = col["id"]
             print(f"✅ Creada '{col['title']}' ({col['id']})")
+
+        skip_pub = os.getenv("SKIP_STORE_PUBLISH", "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        if not skip_pub and publish_resource_to_online_store(col["id"]):
+            print("   📣 Publicada en canal Tienda online (evita 404 en el escaparate)")
 
         time.sleep(5)
         _validate_count(c)

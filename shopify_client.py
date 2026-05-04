@@ -150,3 +150,107 @@ def validate_token() -> dict:
     if dom.get("url"):
         print(f"   URL principal: {dom['url']}")
     return shop
+
+
+_ONLINE_STORE_PUBLICATION_ID: str | None = None
+_ONLINE_STORE_PUBLISH_UNAVAILABLE = False
+
+
+def get_online_store_publication_id() -> str | None:
+    """GID de la publicación «Online Store» / «Tienda online» para publicar recursos."""
+    global _ONLINE_STORE_PUBLICATION_ID, _ONLINE_STORE_PUBLISH_UNAVAILABLE
+    if _ONLINE_STORE_PUBLISH_UNAVAILABLE:
+        return None
+    if _ONLINE_STORE_PUBLICATION_ID:
+        return _ONLINE_STORE_PUBLICATION_ID
+    q = """
+    query pubs {
+      publications(first: 40) {
+        nodes { id name }
+      }
+    }
+    """
+    try:
+        data = graphql(q, max_retries=1)
+    except Exception as exc:
+        _ONLINE_STORE_PUBLISH_UNAVAILABLE = True
+        print(
+            "⚠️ No se puede publicar colecciones en Tienda online sin scopes "
+            "`read_publications` y `write_publications`. Añádelos a la app y reinstala."
+        )
+        print(f"   Detalle: {exc}")
+        return None
+    for node in data.get("publications", {}).get("nodes", []):
+        name = (node.get("name") or "").strip().lower()
+        if "online store" in name or "tienda online" in name:
+            _ONLINE_STORE_PUBLICATION_ID = node["id"]
+            return _ONLINE_STORE_PUBLICATION_ID
+    print("⚠️ No se encontró la publicación Online Store en publications.")
+    _ONLINE_STORE_PUBLISH_UNAVAILABLE = True
+    return None
+
+
+def publish_resource_to_online_store(resource_gid: str) -> bool:
+    """
+    Publica un recurso (colección, etc.) en el canal Tienda online.
+    Evita 404 en el escaparate cuando la colección existe en Admin pero no está publicada.
+    """
+    pub_id = get_online_store_publication_id()
+    if not pub_id:
+        return False
+    mutation = """
+    mutation publishablePublish($id: ID!, $input: [PublicationInput!]!) {
+      publishablePublish(id: $id, input: $input) {
+        userErrors { field message }
+        publishable {
+          ... on Collection { id handle }
+        }
+      }
+    }
+    """
+    try:
+        result = graphql(
+            mutation,
+            {"id": resource_gid, "input": [{"publicationId": pub_id}]},
+            max_retries=1,
+        )
+    except Exception as exc:
+        print(f"⚠️ publishablePublish omitido: {exc}")
+        return False
+    block = result.get("publishablePublish") or {}
+    errs = block.get("userErrors") or []
+    if errs:
+        msgs = [str(e.get("message", e)).lower() for e in errs]
+        if any("already" in m or "published" in m for m in msgs):
+            return True
+        print(f"⚠️ publishablePublish: {errs}")
+        return False
+    return True
+
+
+def print_store_tier_and_checklist(shop: dict) -> None:
+    """Aclara Shopify Plus vs automatización y checklist para tienda lista en producción."""
+    plan = (shop.get("plan") or {}).get("displayName") or "desconocido"
+    print("\n📌 Plan comercial y Shopify Plus")
+    print(f"   Plan detectado en Admin: {plan}")
+    if "plus" not in plan.lower():
+        print(
+            "   Shopify Plus no se «activa» con este script: es un plan empresarial "
+            "contratable con Shopify (límites API más altos, Checkout extensible, "
+            "B2B avanzado, organización multi‑tienda). Información: "
+            "https://www.shopify.com/plus"
+        )
+    else:
+        print("   Tienes Shopify Plus: revisa límites de API y Checkout según tus apps.")
+
+    print(
+        "\n📌 Checklist para que la tienda quede sólida (cualquier plan pago):\n"
+        "   1) App «Lupe Automation»: scopes Admin API completos (ver .env.example).\n"
+        "   2) Tras cambiar scopes: guardar app → Instalar de nuevo → nuevo token en .env.\n"
+        "   3) Sin 404 en colecciones: read_publications + write_publications "
+        "(este repo publica al canal Tienda online).\n"
+        "   4) Menú: read/write online_store_navigation (REST menús o GraphQL menuUpdate).\n"
+        "   5) CONTACT_PAGE_PATH si tu página no es /pages/contacto.\n"
+        "   6) Search & Discovery (filtros) + «Habilitar filtrado» en tema Xtra (manual).\n"
+        "   7) SKIP_STORE_PUBLISH=1 en .env solo si publicas colecciones solo desde Admin."
+    )
