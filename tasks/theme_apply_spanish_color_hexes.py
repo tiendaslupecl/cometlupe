@@ -14,7 +14,7 @@ Requiere: read_themes, write_themes
 
   python tasks/theme_apply_spanish_color_hexes.py --handles handle-a handle-b
 
-Por defecto fusiona los dos hilos Lama (2000 y 5000 yardas).
+Por defecto fusiona hilos Lama: 2000 yardas, 5000 yardas y Overlock 150g.
 """
 from __future__ import annotations
 
@@ -40,6 +40,7 @@ SHOP = (os.getenv("SHOP_DOMAIN") or "").strip().replace("https://", "").split("/
 DEFAULT_MERGE_HANDLES = [
     "hilo-2000-yardas-lama-40-2-elige-tu-color-poliester-profesional",
     "hilo-de-costura-profesional-lama-5000-yardas-elige-tu-color-29-colores",
+    "hilo-overlock-150g-lama",
 ]
 
 # Nombres exactos como en Admin + hex representativo (hilos / tonos tela)
@@ -89,6 +90,16 @@ SPANISH_COLOR_HEX: dict[str, str] = {
     "Rosa Pastel": "#FFD1DC",
     "Cafe": "#5D4037",
     "Beige": "#F5F5DC",
+    # Hilo Overlock 150g (y similares)
+    "Verde Petróleo": "#1B4D4D",
+    "Calipso": "#00CED1",
+    "Morado Profesional": "#4B0082",
+    "Palo Rosa": "#E8A0A8",
+    "Amarillo Oro": "#E6C200",
+    "Gris Oscuro": "#4A4A4A",
+    "Beige Profesional": "#B8A88E",
+    "Arena": "#C2B280",
+    "Vela": "#F5F0E6",
 }
 
 QUERY = """
