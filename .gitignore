@@ -1,4 +1,8 @@
+# Secrets / env
 .env
+*.key
+
+# Python
 __pycache__/
 *.py[cod]
 .venv/
@@ -6,3 +10,10 @@ venv/
 *.egg-info/
 execution_log.json
 SALIDA_ULTIMA_EJECUCION.txt
+
+# Windows / editor
+Thumbs.db
+.vscode/
+
+# Logs
+*.log
