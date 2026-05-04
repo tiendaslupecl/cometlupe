@@ -1,0 +1,75 @@
+<header class="lupe-header" style="position:sticky;top:0;z-index:50;background:rgba(15,23,42,.92);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b">
+  <div class="lupe-container" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 0">
+    <a href="{{ routes.root_url }}" style="font-weight:900;font-size:20px;text-decoration:none;color:#f8fafc">{{ section.settings.logo_text }}</a>
+    <nav aria-label="Principal" style="display:flex;flex-wrap:wrap;gap:8px;margin-left:auto">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'link' %}
+            <a href="{{ block.settings.url }}" style="padding:8px 10px;border-radius:8px;text-decoration:none;color:#e2e8f0;font-weight:600;font-size:14px" {{ block.shopify_attributes }}>{{ block.settings.label }}</a>
+          {% when 'mega' %}
+            <div class="lupe-mega" style="position:relative" {{ block.shopify_attributes }}>
+              <button type="button" class="lupe-mega__btn" style="background:#1e293b;border:1px solid #334155;color:#f8fafc;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer">{{ block.settings.label }}</button>
+              <div class="lupe-mega__panel lupe-card" style="display:none;position:absolute;left:0;top:100%;margin-top:8px;min-width:min(96vw,720px);padding:16px;z-index:60">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+                  {% if block.settings.image != blank %}
+                    <a href="{{ block.settings.url }}"><img src="{{ block.settings.image | image_url: width: 400 }}" alt="" width="200" height="140" loading="lazy" style="width:100%;border-radius:10px;object-fit:cover"></a>
+                  {% endif %}
+                  <div>
+                    <p style="margin:0 0 8px;font-weight:800">{{ block.settings.title }}</p>
+                    <div style="font-size:13px;color:#94a3b8;white-space:pre-line">{{ block.settings.links }}</div>
+                    <a class="lupe-btn lupe-btn--primary" style="margin-top:10px;display:inline-block" href="{{ block.settings.url }}">{{ block.settings.cta }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </nav>
+    <a href="{{ routes.cart_url }}" class="lupe-btn lupe-btn--secondary" style="padding:.5rem .9rem;font-size:14px">Carrito ({{ cart.item_count }})</a>
+  </div>
+</header>
+<style>.lupe-mega:focus-within .lupe-mega__panel,.lupe-mega:hover .lupe-mega__panel{display:block!important}</style>
+{% schema %}
+{
+  "name": "Header CRO + mega",
+  "tag": "header",
+  "settings": [{ "type": "text", "id": "logo_text", "label": "Texto logo", "default": "Tiendas Lupe" }],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Enlace",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Texto", "default": "Ofertas" },
+        { "type": "url", "id": "url", "label": "URL", "default": "/collections/all" }
+      ]
+    },
+    {
+      "type": "mega",
+      "name": "Mega menú",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Etiqueta", "default": "Insumos" },
+        { "type": "text", "id": "title", "label": "Título panel", "default": "Insumos de confección" },
+        { "type": "textarea", "id": "links", "label": "Links (una por línea: Texto|URL)", "default": "Hilos|/collections/insumos-confeccion\nElásticos|/collections/insumos-confeccion" },
+        { "type": "url", "id": "url", "label": "URL CTA", "default": "/collections/insumos-confeccion" },
+        { "type": "text", "id": "cta", "label": "Texto CTA", "default": "Ver colección" },
+        { "type": "image_picker", "id": "image", "label": "Imagen" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header CRO",
+      "blocks": [
+        { "type": "link", "settings": { "label": "Empezar", "url": "/collections/insumos-confeccion" } },
+        { "type": "link", "settings": { "label": "Emprender", "url": "/collections/herramientas-costura" } },
+        { "type": "link", "settings": { "label": "Taller", "url": "/collections/maquinas-y-repuestos" } },
+        { "type": "mega", "settings": { "label": "Máquinas", "title": "Máquinas y repuestos", "links": "Repuestos|/collections/maquinas-y-repuestos\nAgujas|/collections/maquinas-y-repuestos", "url": "/collections/maquinas-y-repuestos", "cta": "Ver máquinas" } },
+        { "type": "mega", "settings": { "label": "Insumos", "title": "Insumos", "links": "Hilos|/collections/insumos-confeccion\nCierres|/collections/insumos-confeccion", "url": "/collections/insumos-confeccion", "cta": "Ver insumos" } },
+        { "type": "link", "settings": { "label": "Repuestos", "url": "/collections/maquinas-y-repuestos" } },
+        { "type": "link", "settings": { "label": "Ofertas", "url": "/collections/all" } },
+        { "type": "link", "settings": { "label": "Mayorista", "url": "/pages/compra-por-mayor" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

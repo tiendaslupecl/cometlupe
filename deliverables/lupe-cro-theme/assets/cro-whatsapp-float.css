@@ -1,0 +1,6 @@
+.wa-float{position:fixed;right:16px;bottom:16px;z-index:9998;font-family:var(--lupe-font,system-ui,sans-serif)}
+.wa-float__toggle{width:56px;height:56px;border-radius:50%;border:0;background:#25d366;color:#fff;cursor:pointer;box-shadow:0 12px 40px rgba(0,0,0,.35);display:grid;place-items:center}
+.wa-float__panel{position:absolute;right:0;bottom:64px;width:min(92vw,280px);background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.wa-float__title{margin:0 0 4px;font-size:14px;font-weight:700}
+.wa-float__link{display:block;padding:10px 12px;border-radius:10px;background:#1e293b;color:#f8fafc;text-decoration:none;font-weight:600;font-size:14px;border:1px solid #334155}
+.wa-float__link:hover{background:#334155}

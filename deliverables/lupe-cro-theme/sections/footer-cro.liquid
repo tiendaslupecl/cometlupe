@@ -1,0 +1,51 @@
+<footer class="lupe-footer" style="border-top:1px solid #1e293b;padding:40px 0 60px;background:#070b14">
+  <div class="lupe-container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px">
+    <div>
+      <p style="margin:0 0 12px;font-weight:800">{{ section.settings.col_a_title }}</p>
+      <ul style="margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px;color:#cbd5e1">
+        {% if section.settings.menu_seo != blank %}
+          {% for link in linklists[section.settings.menu_seo].links %}
+            <li><a href="{{ link.url }}" style="color:inherit">{{ link.title }}</a></li>
+          {% endfor %}
+        {% else %}
+          <li><a href="/policies/privacy-policy" style="color:inherit">Privacidad</a></li>
+          <li><a href="/policies/terms-of-service" style="color:inherit">Términos</a></li>
+        {% endif %}
+      </ul>
+    </div>
+    <div>
+      <p style="margin:0 0 12px;font-weight:800">{{ section.settings.col_b_title }}</p>
+      <ul style="margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px;color:#cbd5e1">
+        {% if section.settings.menu_cat != blank %}
+          {% for link in linklists[section.settings.menu_cat].links %}
+            <li><a href="{{ link.url }}" style="color:inherit">{{ link.title }}</a></li>
+          {% endfor %}
+        {% else %}
+          <li><a href="/collections/insumos-confeccion" style="color:inherit">Insumos</a></li>
+          <li><a href="/collections/maquinas-y-repuestos" style="color:inherit">Máquinas</a></li>
+        {% endif %}
+      </ul>
+    </div>
+    <div>
+      <p style="margin:0 0 12px;font-weight:800">Contacto</p>
+      <p style="margin:0;font-size:14px;color:#cbd5e1"><a href="mailto:{{ section.settings.email }}" style="color:inherit">{{ section.settings.email }}</a></p>
+      <p style="margin:8px 0 0;font-size:14px"><a href="https://wa.me/{{ settings.cro_whatsapp_e164 }}" style="color:#4ade80;font-weight:700">WhatsApp</a></p>
+      <p style="margin:12px 0 0"><a class="lupe-btn lupe-btn--primary" href="{{ settings.cro_mayorista_url }}">Mayorista</a></p>
+    </div>
+  </div>
+  <p class="lupe-container" style="margin:32px 0 0;font-size:12px;color:#64748b">© {{ 'now' | date: '%Y' }} {{ shop.name }}. Precios CLP. Chile.</p>
+</footer>
+{% schema %}
+{
+  "name": "Footer CRO SEO",
+  "tag": "footer",
+  "settings": [
+    { "type": "text", "id": "col_a_title", "label": "Columna A título", "default": "SEO / legal" },
+    { "type": "link_list", "id": "menu_seo", "label": "Menú SEO" },
+    { "type": "text", "id": "col_b_title", "label": "Columna B título", "default": "Categorías" },
+    { "type": "link_list", "id": "menu_cat", "label": "Menú categorías" },
+    { "type": "text", "id": "email", "label": "Email", "default": "ventas@tiendaslupe.cl" }
+  ],
+  "presets": [{ "name": "Footer CRO SEO" }]
+}
+{% endschema %}

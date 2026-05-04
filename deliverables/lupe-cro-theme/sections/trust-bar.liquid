@@ -1,0 +1,40 @@
+<section class="lupe-trust lupe-container" style="padding:12px 0 32px">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+    {% for block in section.blocks %}
+      <div class="lupe-card" style="text-align:center;padding:16px 12px" {{ block.shopify_attributes }}>
+        <div style="font-size:28px;margin-bottom:6px" aria-hidden="true">{{ block.settings.icon }}</div>
+        <p style="margin:0;font-weight:700;font-size:14px">{{ block.settings.title }}</p>
+        <p style="margin:4px 0 0;font-size:12px;color:var(--lupe-muted,#94a3b8)">{{ block.settings.text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Barra de confianza",
+  "tag": "section",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Ítem",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji ícono", "default": "🚚" },
+        { "type": "text", "id": "title", "label": "Título", "default": "Envíos rápidos" },
+        { "type": "text", "id": "text", "label": "Texto", "default": "Despacho en días hábiles" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barra de confianza",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "🚚", "title": "Envíos rápidos", "text": "A todo Chile" } },
+        { "type": "item", "settings": { "icon": "📦", "title": "Stock real", "text": "Inventario actualizado" } },
+        { "type": "item", "settings": { "icon": "🧵", "title": "Asesoría experta", "text": "Aguja, hilo y repuesto" } },
+        { "type": "item", "settings": { "icon": "🏭", "title": "Venta mayorista", "text": "Precios por volumen" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

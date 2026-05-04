@@ -1,0 +1,38 @@
+<section class="lupe-bestsellers lupe-container" style="padding:0 0 48px">
+  <h2 style="margin:0 0 16px;font-size:clamp(22px,3vw,30px)">{{ section.settings.heading }}</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px">
+    {% for product in section.settings.products %}
+      <div class="lupe-card" style="padding:12px">
+        <a href="{{ product.url }}" style="text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center">
+          {%- if product.featured_image -%}
+            <img src="{{ product.featured_image | image_url: width: 120 }}" alt="" width="60" height="60" loading="lazy" style="border-radius:8px;object-fit:cover">
+          {%- endif -%}
+          <div>
+            <p style="margin:0;font-weight:700;font-size:14px">{{ product.title }}</p>
+            <p style="margin:4px 0 0;font-size:13px">{{ product.price | money }}</p>
+          </div>
+        </a>
+        {% render 'upsell-inline', host: product %}
+      </div>
+    {% endfor %}
+  </div>
+  {% if section.settings.comp_collection != blank %}
+    <div class="lupe-card" style="padding:16px">
+      <h3 style="margin:0 0 12px;font-size:18px">{{ section.settings.fbt_heading }}</h3>
+      {% render 'frequently-bought', collection: section.settings.comp_collection %}
+    </div>
+  {% endif %}
+</section>
+{% schema %}
+{
+  "name": "Best sellers CRO",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Lo más vendido + upsell" },
+    { "type": "product_list", "id": "products", "label": "Productos", "limit": 8 },
+    { "type": "text", "id": "fbt_heading", "label": "Título FBT", "default": "Frecuentemente comprados juntos" },
+    { "type": "collection", "id": "comp_collection", "label": "Colección para FBT (complementos)" }
+  ],
+  "presets": [{ "name": "Best sellers CRO" }]
+}
+{% endschema %}

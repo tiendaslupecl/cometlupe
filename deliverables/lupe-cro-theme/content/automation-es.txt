@@ -1,0 +1,61 @@
+=== A) CARRITO ABANDONADO (3 correos) ===
+EMAIL 1 — Asunto: Tu carrito en Tiendas Lupe te está esperando
+Cuerpo:
+Hola {{ customer.first_name | default: 'hola' }},
+Dejaste productos listos para despacho en Chile. Stock verificado y envío rápido.
+CTA: [Finalizar compra]
+PS: Si necesitas aguja/hilo para tu tela, responde este mail y te orientamos.
+
+EMAIL 2 — Asunto: Últimas unidades en algunos ítems de tu carrito
+Cuerpo:
+Hola {{ customer.first_name | default: 'hola' }},
+Algunos productos de tu carrito se venden rápido. Evita reprogramar tu producción.
+CTA: [Volver al carrito]
+Bloque recomendado: complemento frecuente (tijeras, hilo extra, agujas).
+
+EMAIL 3 — Asunto: 10% extra si cierras hoy (solo este carrito)
+Cuerpo:
+Hola {{ customer.first_name | default: 'hola' }},
+Cupón: LUPECIERRA10 (aplicar en checkout, ventana 24h, exclusiones según política de la tienda).
+CTA: [Completar pedido]
+
+=== B) BIENVENIDA (3 correos) ===
+EMAIL 1 — Asunto: Bienvenido/a a Tiendas Lupe — tu mapa de compra en 60s
+Cuerpo:
+Segmentos: Principiante / Emprendedor / Taller.
+Enlaces: Insumos, Herramientas, Máquinas y repuestos, Mayorista.
+CTA: [Elegir mi segmento en WhatsApp]
+
+EMAIL 2 — Asunto: Los 3 errores que encarecen la costura (y cómo evitarlos)
+Cuerpo:
+Aguja incorrecta, tensión mal calibrada, hilo incompatible con tela.
+CTA: [Ver guías en el blog]
+
+EMAIL 3 — Asunto: Tu checklist de compra inteligente (CLP)
+Cuerpo:
+Lista PDF: aguja por tela, hilo por calibre, repuestos críticos.
+CTA: [Descargar checklist] + [Ver más vendidos]
+
+=== C) POST‑COMPRA ===
+Asunto: Tu pedido va en camino — tips para recibir sin sorpresas
+Cuerpo:
+Seguimiento, empaque, revisión en 24h post‑recepción.
+CTA: [Ver estado del pedido]
+Upsell: repuestos de aguja y limpieza de máquina.
+
+=== D) REPOSICIÓN 30 DÍAS ===
+Asunto: ¿Te quedó poco hilo / agujas?
+Cuerpo:
+Reposición sugerida según categoría comprada.
+CTA: [Reordenar en 1 clic]
+
+=== E) B2B ===
+Asunto: Cotización mayorista — volumen y frecuencia
+Cuerpo:
+Formulario mínimo: RUT, giro, volumen mensual, máquinas.
+CTA: [Enviar a ventas@tiendaslupe.cl] + [WhatsApp taller]
+
+=== WHATSAPP (scripts) ===
+WA‑PRINCIPIENTE: "Hola Tiendas Lupe, soy principiante. Tengo máquina {{ modelo }} y coso {{ tela }}. ¿Qué aguja e hilo me recomiendan? Presupuesto CLP {{ rango }}."
+WA‑EMPRENDEDOR: "Hola Lupe, emprendo en confección. Necesito optimizar costos en {{ categoría }} con calidad {{ nivel }}. ¿Qué packs o mayorista conviene?"
+WA‑TALLER: "Hola, taller B2B. Busco cotización por {{ sku/categoria }}, volumen {{ unidades_mes }}, despacho {{ ciudad }}. ¿Lista mayorista y plazos?"

@@ -1,0 +1,27 @@
+{% doc %} Tarjeta bundle: ahorro %, compare_at, bullets. Param: card_product {% enddoc %}
+{%- assign p = card_product -%}
+{%- if p != blank -%}
+{%- assign compare = p.compare_at_price -%}
+{%- assign price = p.price -%}
+{%- assign save = 0 -%}
+{%- if compare > price and compare > 0 -%}
+  {%- assign save = compare | minus: price | times: 100 | divided_by: compare -%}
+{%- endif -%}
+<article class="lupe-card" style="height:100%;display:flex;flex-direction:column">
+  <a href="{{ p.url }}" style="text-decoration:none;color:inherit">
+    {%- if p.featured_image -%}
+      <img src="{{ p.featured_image | image_url: width: 600 }}" alt="{{ p.featured_image.alt | default: p.title | escape }}" width="600" height="600" loading="lazy" style="width:100%;border-radius:10px;margin-bottom:12px;aspect-ratio:1;object-fit:cover">
+    {%- endif -%}
+    <h3 style="margin:0 0 8px;font-size:18px">{{ p.title }}</h3>
+    <p style="margin:0 0 12px;font-size:13px;color:var(--lupe-muted,#94a3b8)">{{ p.metafields.custom.bundle_para.value | default: 'Para principiantes, emprendedores o taller.' }}</p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:22px;font-weight:800">{{ p.price | money }}</span>
+      {%- if show_compare and compare > price -%}
+        <s style="color:var(--lupe-muted,#94a3b8)">{{ compare | money }}</s>
+        <span style="background:var(--lupe-warn,#f59e0b);color:#0f172a;font-weight:800;font-size:12px;padding:4px 8px;border-radius:999px">-{{ save }}%</span>
+      {%- endif -%}
+    </div>
+  </a>
+  <a class="lupe-btn lupe-btn--primary" style="margin-top:auto;width:100%;text-align:center" href="{{ p.url }}">Comprar bundle</a>
+</article>
+{%- endif -%}

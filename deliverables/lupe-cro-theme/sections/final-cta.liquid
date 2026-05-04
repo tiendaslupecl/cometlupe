@@ -1,0 +1,25 @@
+<section class="lupe-finalcta lupe-container" style="padding:0 0 64px">
+  <div class="lupe-card" style="text-align:center;background:linear-gradient(135deg,#14532d,#0f172a);border-color:#166534">
+    <h2 style="margin:0 0 10px;font-size:clamp(22px,3vw,30px)">{{ section.settings.heading }}</h2>
+    <p style="margin:0 auto 20px;max-width:560px;color:#cbd5e1">{{ section.settings.sub }}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+      <a class="lupe-btn lupe-btn--primary" href="{{ section.settings.primary_url }}">{{ section.settings.primary_label }}</a>
+      <a class="lupe-btn lupe-btn--ghost" href="https://wa.me/{{ settings.cro_whatsapp_e164 }}?text={{ section.settings.wa_presell | url_encode }}" target="_blank" rel="noopener">{{ section.settings.wa_label }}</a>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "CTA final CRO",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Compra hoy, produce mañana" },
+    { "type": "textarea", "id": "sub", "label": "Subtítulo", "default": "CLP · Envíos Chile · Mayorista disponible." },
+    { "type": "text", "id": "primary_label", "label": "Botón principal", "default": "Ir a insumos" },
+    { "type": "url", "id": "primary_url", "label": "URL principal", "default": "/collections/insumos-confeccion" },
+    { "type": "text", "id": "wa_label", "label": "Botón WhatsApp", "default": "WhatsApp asesoría" },
+    { "type": "textarea", "id": "wa_presell", "label": "Mensaje WA prellenado", "default": "Hola Tiendas Lupe, quiero cotizar insumos para mi taller en Chile." }
+  ],
+  "presets": [{ "name": "CTA final CRO" }]
+}
+{% endschema %}

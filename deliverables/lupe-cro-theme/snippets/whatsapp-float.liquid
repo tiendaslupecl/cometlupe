@@ -1,0 +1,36 @@
+{% doc %}
+  Botón flotante WhatsApp con mensajes por segmento (principiante / emprendedor / taller).
+  Parámetros: phone (E.164 sin +), brand (nombre tienda)
+{% enddoc %}
+{%- liquid
+  assign wa = phone | default: settings.cro_whatsapp_e164 | default: '56963855857'
+  assign base = settings.cro_whatsapp_base | default: 'https://wa.me/'
+  assign brand_name = brand | default: shop.name
+  assign wa_url = base | append: wa
+-%}
+<link rel="stylesheet" href="{{ 'cro-whatsapp-float.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript>{{ 'cro-whatsapp-float.css' | asset_url | stylesheet_tag }}</noscript>
+<div class="wa-float" data-wa-root>
+  <button type="button" class="wa-float__toggle" aria-expanded="false" aria-controls="wa-float-panel" id="wa-float-btn" data-wa-toggle>
+    <span class="wa-float__icon" aria-hidden="true">{% render 'icon-whatsapp' %}</span>
+    <span class="visually-hidden">WhatsApp {{ brand_name }}</span>
+  </button>
+  <div class="wa-float__panel" id="wa-float-panel" hidden data-wa-panel>
+    <p class="wa-float__title">¿Cómo te ayudamos?</p>
+    <a class="wa-float__link" href="{{ wa_url }}?text={{ 'Soy principiante y necesito orientación para comprar en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Principiante</a>
+    <a class="wa-float__link" href="{{ wa_url }}?text={{ 'Emprendo en costura y quiero escalar compras en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Emprendedor</a>
+    <a class="wa-float__link" href="{{ wa_url }}?text={{ 'Tengo taller B2B: cotización y stock en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Taller (B2B)</a>
+  </div>
+</div>
+<script>
+(function(){
+  var b=document.querySelector('[data-wa-toggle]');
+  var p=document.querySelector('[data-wa-panel]');
+  if(!b||!p)return;
+  b.addEventListener('click',function(){
+    var o=b.getAttribute('aria-expanded')==='true';
+    b.setAttribute('aria-expanded',o?'false':'true');
+    p.hidden=o;
+  });
+})();
+</script>

@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "header": {
+      "type": "header-cro",
+      "settings": { "logo_text": "Tiendas Lupe" },
+      "blocks": {
+        "h1": { "type": "link", "settings": { "label": "Inicio", "url": "/" } },
+        "h2": { "type": "link", "settings": { "label": "Mayorista", "url": "/pages/compra-por-mayor" } }
+      },
+      "block_order": ["h1", "h2"]
+    },
+    "main": {
+      "type": "collection-cro",
+      "blocks": {
+        "f1": { "type": "filter", "settings": { "label": "Tela: mezclilla", "url": "/collections/all?filter.p.m.custom.tipo_tela=mezclilla" } },
+        "f2": { "type": "filter", "settings": { "label": "Máquina: recta", "url": "/collections/all?filter.p.m.custom.tipo_maquina=recta" } },
+        "f3": { "type": "filter", "settings": { "label": "Nivel: principiante", "url": "/collections/all?filter.p.m.custom.nivel_usuario=principiante" } },
+        "f4": { "type": "filter", "settings": { "label": "Uso: confección", "url": "/collections/all?filter.p.m.custom.uso=confeccion" } }
+      },
+      "block_order": ["f1", "f2", "f3", "f4"]
+    },
+    "footer": { "type": "footer-cro", "settings": { "email": "ventas@tiendaslupe.cl" } }
+  },
+  "order": ["header", "main", "footer"]
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Tiendas Lupe — CRO",
+    "settings": [
+      {
+        "type": "header",
+        "content": "WhatsApp"
+      },
+      {
+        "type": "text",
+        "id": "cro_whatsapp_e164",
+        "label": "WhatsApp (E.164 sin +)",
+        "default": "56963855857",
+        "info": "Ejemplo Chile: 56912345678"
+      },
+      {
+        "type": "url",
+        "id": "cro_whatsapp_base",
+        "label": "URL base wa.me (opcional)",
+        "info": "Si vacío se usa https://wa.me/"
+      },
+      {
+        "type": "header",
+        "content": "Mayorista"
+      },
+      {
+        "type": "url",
+        "id": "cro_mayorista_url",
+        "label": "Página mayorista",
+        "default": "/pages/compra-por-mayor"
+      },
+      {
+        "type": "header",
+        "content": "Bundles"
+      },
+      {
+        "type": "product_list",
+        "id": "cro_bundle_products",
+        "label": "Productos bundle destacados",
+        "limit": 6
+      }
+    ]
+  }
+]

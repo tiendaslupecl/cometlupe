@@ -1,0 +1,104 @@
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+<section class="lupe-pdp lupe-container" style="padding:24px 0 80px;display:grid;grid-template-columns:1fr;gap:24px" id="lupe-pdp" data-pdp>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:start">
+    <div>
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 1200 }}" alt="{{ product.featured_media.alt | default: product.title | escape }}" width="800" height="800" loading="eager" style="width:100%;border-radius:16px;border:1px solid #334155;object-fit:cover">
+      {% endif %}
+      <div class="lupe-card" style="margin-top:14px;padding:14px">
+        <h2 style="margin:0 0 8px;font-size:16px">Mini guía de uso</h2>
+        <p style="margin:0;font-size:14px;color:#94a3b8">{{ section.settings.mini_guide }}</p>
+      </div>
+    </div>
+    <div>
+      <h1 style="margin:0 0 8px;font-size:clamp(24px,4vw,34px)">{{ product.title }}</h1>
+      <p style="margin:0 0 12px;color:#94a3b8">{{ product.vendor }}</p>
+      {% render 'trust-badges' %}
+      <div style="font-size:28px;font-weight:900;margin:12px 0">{{ current_variant.price | money }}</div>
+      {%- if current_variant.inventory_quantity <= section.settings.low_stock_threshold and current_variant.inventory_management -%}
+        <p style="margin:0 0 12px;color:#fbbf24;font-weight:700">Quedan pocas unidades: {{ current_variant.inventory_quantity }}</p>
+      {%- endif -%}
+      {% form 'product', product, id: 'LupeProductForm', class: 'lupe-product-form' %}
+        {% unless product.has_only_default_variant %}
+          <div style="margin-bottom:12px">
+            {% for option in product.options_with_values %}
+              <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">{{ option.name }}</label>
+              <select name="options[{{ option.name | escape }}]" style="width:100%;padding:10px;border-radius:10px;background:#0f172a;color:#f8fafc;border:1px solid #334155">
+                {% for value in option.values %}
+                  <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+              </select>
+            {% endfor %}
+          </div>
+        {% endunless %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">Cantidad</label>
+        <input name="quantity" type="number" min="1" value="1" style="width:120px;padding:10px;border-radius:10px;background:#0f172a;color:#f8fafc;border:1px solid #334155;margin-bottom:12px">
+        <button type="submit" name="add" class="lupe-btn lupe-btn--primary" style="width:100%;margin-bottom:10px">Añadir al carrito</button>
+        <a class="lupe-btn lupe-btn--ghost" style="width:100%;text-align:center" href="https://wa.me/{{ settings.cro_whatsapp_e164 }}?text={{ section.settings.wa_msg | append: ' ' | append: product.title | append: ' ' | append: request.origin | append: product.url | url_encode }}" target="_blank" rel="noopener">WhatsApp: consultar este producto</a>
+      {% endform %}
+      {% render 'quantity-breaks', product: product %}
+      <div class="lupe-card" style="margin-top:16px;padding:14px">
+        <p style="margin:0 0 8px;font-weight:800">Completa tu compra</p>
+        {% render 'upsell-inline', host: product %}
+      </div>
+      <div class="lupe-card" style="margin-top:16px;padding:14px">
+        <p style="margin:0 0 8px;font-weight:800">Frecuentemente comprados juntos</p>
+        {% assign fbt = collections[section.settings.fbt_collection] %}
+        {% render 'frequently-bought', collection: fbt %}
+      </div>
+    </div>
+  </div>
+</section>
+<div id="lupe-sticky-atc" class="lupe-sticky-atc" style="position:fixed;left:0;right:0;bottom:0;padding:12px;background:rgba(15,23,42,.95);border-top:1px solid #334155;display:none;z-index:40">
+  <div class="lupe-container" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+    <div>
+      <p style="margin:0;font-weight:800;font-size:14px">{{ product.title | truncate: 48 }}</p>
+      <p style="margin:0;font-size:13px;color:#94a3b8">{{ current_variant.price | money }}</p>
+    </div>
+    <button type="submit" form="LupeProductForm" class="lupe-btn lupe-btn--primary">Comprar</button>
+  </div>
+</div>
+<script type="application/json" id="lupe-variant-json">{{ product.variants | json }}</script>
+<script>
+(function(){
+  var pdp=document.querySelector('[data-pdp]');
+  var bar=document.getElementById('lupe-sticky-atc');
+  if(pdp&&bar){
+    var io=new IntersectionObserver(function(e){
+      e.forEach(function(x){ bar.style.display=x.isIntersecting?'none':'flex'; });
+    },{rootMargin:'-40% 0px 0px 0px',threshold:0});
+    io.observe(pdp);
+  }
+  var form=document.getElementById('LupeProductForm');
+  var el=document.getElementById('lupe-variant-json');
+  if(!form||!el)return;
+  var variants=JSON.parse(el.textContent);
+  var hid=form.querySelector('input[name="id"]');
+  function sync(){
+    var opts=[];
+    form.querySelectorAll('select[name^="options"]').forEach(function(s){opts.push(s.value);});
+    var found=variants.find(function(v){
+      var o=v.options||[];
+      for(var i=0;i<opts.length;i++){ if(String(o[i])!==String(opts[i])) return false; }
+      return o.length===opts.length;
+    });
+    if(found&&hid)hid.value=found.id;
+  }
+  form.addEventListener('change',sync);
+})();
+</script>
+{% schema %}
+{
+  "name": "Producto CRO (AOV)",
+  "tag": "section",
+  "class": "section-main-product-cro",
+  "settings": [
+    { "type": "textarea", "id": "mini_guide", "label": "Mini guía", "default": "Regula tensión, usa aguja acorde al tejido y prueba en retazo antes de producir." },
+    { "type": "range", "id": "low_stock_threshold", "label": "Umbral urgencia stock", "min": 1, "max": 50, "step": 1, "default": 8 },
+    { "type": "text", "id": "wa_msg", "label": "Prefijo mensaje WA", "default": "Hola Lupe, consulto por" },
+    { "type": "text", "id": "fbt_collection", "label": "Handle colección FBT", "default": "insumos-confeccion" }
+  ],
+  "presets": [{ "name": "Producto CRO (AOV)" }]
+}
+{% endschema %}

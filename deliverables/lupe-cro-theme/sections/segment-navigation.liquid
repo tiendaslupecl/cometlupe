@@ -1,0 +1,42 @@
+<section class="lupe-segments lupe-container" style="padding:0 0 40px">
+  <h2 class="visually-hidden">Segmentos</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.url }}" class="lupe-card" style="text-decoration:none;color:inherit;display:block;transition:transform .15s ease" {{ block.shopify_attributes }}>
+        <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lupe-accent-2,#38bdf8)">{{ block.settings.kicker }}</p>
+        <h3 style="margin:0 0 10px;font-size:22px">{{ block.settings.title }}</h3>
+        <p style="margin:0;font-size:14px;color:var(--lupe-muted,#94a3b8)">{{ block.settings.copy }}</p>
+        <span class="lupe-btn lupe-btn--primary" style="margin-top:16px;width:100%">Ver catálogo</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Navegación por segmento",
+  "tag": "section",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Tarjeta segmento",
+      "settings": [
+        { "type": "text", "id": "kicker", "label": "Etiqueta", "default": "Segmento" },
+        { "type": "text", "id": "title", "label": "Título", "default": "Principiante" },
+        { "type": "textarea", "id": "copy", "label": "Texto", "default": "Kits y guías para empezar sin errores." },
+        { "type": "url", "id": "url", "label": "Enlace", "default": "/collections/insumos-confeccion" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Navegación por segmento",
+      "blocks": [
+        { "type": "card", "settings": { "kicker": "Aprende", "title": "Principiante", "copy": "Hilos, agujas y herramientas con explicación clara.", "url": "/collections/insumos-confeccion" } },
+        { "type": "card", "settings": { "kicker": "Crece", "title": "Emprendedor", "copy": "Optimiza costos y calidad para vender más.", "url": "/collections/herramientas-costura" } },
+        { "type": "card", "settings": { "kicker": "Produce", "title": "Taller (B2B)", "copy": "Repuestos y máquinas para producción continua.", "url": "/collections/maquinas-y-repuestos" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

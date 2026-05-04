@@ -1,0 +1,25 @@
+<section class="lupe-bundles lupe-container" style="padding:0 0 48px">
+  <div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px">
+    <h2 style="margin:0;font-size:clamp(22px,3vw,30px)">{{ section.settings.heading }}</h2>
+    <a href="{{ section.settings.collection_url }}" class="lupe-btn lupe-btn--ghost" style="font-size:14px">{{ section.settings.collection_label }}</a>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    {% for product in section.settings.product_list %}
+      {% render 'bundle-card', card_product: product, show_compare: section.settings.show_compare %}
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Bundles destacados CRO",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Bundles con ahorro" },
+    { "type": "product_list", "id": "product_list", "label": "Productos bundle", "limit": 6 },
+    { "type": "checkbox", "id": "show_compare", "label": "Mostrar precio comparación", "default": true },
+    { "type": "url", "id": "collection_url", "label": "Ver más (URL)", "default": "/collections/all" },
+    { "type": "text", "id": "collection_label", "label": "Texto ver más", "default": "Ver todos los bundles" }
+  ],
+  "presets": [{ "name": "Bundles destacados CRO" }]
+}
+{% endschema %}

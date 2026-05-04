@@ -1,0 +1,34 @@
+<section class="lupe-hero lupe-container" style="padding:clamp(32px,6vw,72px) 0">
+  <div class="lupe-card" style="text-align:center;max-width:920px;margin:0 auto">
+    <p class="lupe-hero__eyebrow" style="margin:0 0 8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--lupe-accent-2,#38bdf8);font-weight:700">{{ section.settings.eyebrow }}</p>
+    <h1 class="lupe-hero__headline" style="margin:0 0 16px;font-size:clamp(28px,5vw,44px);line-height:1.1">{{ section.settings.headline }}</h1>
+    <p class="lupe-hero__sub" style="margin:0 auto 28px;max-width:640px;color:var(--lupe-muted,#94a3b8);font-size:clamp(15px,2.4vw,18px)">{{ section.settings.subheadline }}</p>
+    <div class="lupe-hero__ctas" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+      <a class="lupe-btn lupe-btn--primary" href="{{ section.settings.cta_beginner_url }}">{{ section.settings.cta_beginner_label }}</a>
+      <a class="lupe-btn lupe-btn--secondary" href="{{ section.settings.cta_smb_url }}">{{ section.settings.cta_smb_label }}</a>
+      <a class="lupe-btn lupe-btn--ghost" href="{{ section.settings.cta_b2b_url }}">{{ section.settings.cta_b2b_label }}</a>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Hero segmentado CRO",
+  "tag": "section",
+  "class": "section-hero-segmented",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Tiendas Lupe · Chile · CLP" },
+    { "type": "textarea", "id": "headline", "label": "Titular", "default": "Todo para producir, vender y escalar en costura" },
+    { "type": "textarea", "id": "subheadline", "label": "Subtitular", "default": "Insumos, repuestos y máquinas con stock real, envíos rápidos y asesoría para principiantes, emprendedores y talleres." },
+    { "type": "header", "content": "CTA Principiante" },
+    { "type": "text", "id": "cta_beginner_label", "label": "Texto botón", "default": "Empezar desde cero" },
+    { "type": "url", "id": "cta_beginner_url", "label": "Enlace", "default": "/collections/insumos-confeccion" },
+    { "type": "header", "content": "CTA Emprendedor" },
+    { "type": "text", "id": "cta_smb_label", "label": "Texto botón", "default": "Escalar mi emprendimiento" },
+    { "type": "url", "id": "cta_smb_url", "label": "Enlace", "default": "/collections/herramientas-costura" },
+    { "type": "header", "content": "CTA Taller B2B" },
+    { "type": "text", "id": "cta_b2b_label", "label": "Texto botón", "default": "Equipar mi taller" },
+    { "type": "url", "id": "cta_b2b_url", "label": "Enlace", "default": "/pages/compra-por-mayor" }
+  ],
+  "presets": [{ "name": "Hero segmentado CRO" }]
+}
+{% endschema %}

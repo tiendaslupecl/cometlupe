@@ -1,0 +1,67 @@
+{
+  "sections": {
+    "header": {
+      "type": "header-cro",
+      "settings": { "logo_text": "Tiendas Lupe" },
+      "blocks": {
+        "h1": { "type": "link", "settings": { "label": "Empezar", "url": "/collections/insumos-confeccion" } },
+        "h2": { "type": "link", "settings": { "label": "Emprender", "url": "/collections/herramientas-costura" } },
+        "h3": { "type": "link", "settings": { "label": "Taller", "url": "/collections/maquinas-y-repuestos" } },
+        "h4": { "type": "link", "settings": { "label": "Ofertas", "url": "/collections/all" } },
+        "h5": { "type": "link", "settings": { "label": "Mayorista", "url": "/pages/compra-por-mayor" } }
+      },
+      "block_order": ["h1", "h2", "h3", "h4", "h5"]
+    },
+    "hero": { "type": "hero-segmented", "settings": {} },
+    "trust": {
+      "type": "trust-bar",
+      "blocks": {
+        "t1": { "type": "item", "settings": { "icon": "🚚", "title": "Envíos rápidos", "text": "A todo Chile" } },
+        "t2": { "type": "item", "settings": { "icon": "📦", "title": "Stock real", "text": "Inventario actualizado" } },
+        "t3": { "type": "item", "settings": { "icon": "🧵", "title": "Asesoría experta", "text": "Aguja, hilo, repuesto" } },
+        "t4": { "type": "item", "settings": { "icon": "🏭", "title": "Venta mayorista", "text": "Precios por volumen" } }
+      },
+      "block_order": ["t1", "t2", "t3", "t4"]
+    },
+    "segments": {
+      "type": "segment-navigation",
+      "blocks": {
+        "s1": { "type": "card", "settings": { "kicker": "Aprende", "title": "Principiante", "copy": "Kits y guías para empezar sin errores.", "url": "/collections/insumos-confeccion" } },
+        "s2": { "type": "card", "settings": { "kicker": "Crece", "title": "Emprendedor", "copy": "Optimiza costos y calidad.", "url": "/collections/herramientas-costura" } },
+        "s3": { "type": "card", "settings": { "kicker": "Produce", "title": "Taller (B2B)", "copy": "Repuestos y máquinas.", "url": "/collections/maquinas-y-repuestos" } }
+      },
+      "block_order": ["s1", "s2", "s3"]
+    },
+    "bundles": { "type": "bundles-featured", "settings": { "heading": "Bundles con ahorro" } },
+    "bestsellers": { "type": "best-sellers-cro", "settings": { "heading": "Best sellers", "fbt_heading": "Frecuentemente comprados juntos" } },
+    "edu": {
+      "type": "education-sales",
+      "settings": {},
+      "blocks": {
+        "e1": { "type": "guide", "settings": { "title": "Agujas por tela", "teaser": "Mezclilla, denim y más.", "url": "/blogs/news", "cta": "Leer" } }
+      },
+      "block_order": ["e1"]
+    },
+    "proof": {
+      "type": "social-proof",
+      "settings": {},
+      "blocks": {
+        "p1": { "type": "quote", "settings": { "quote": "Stock confiable y despacho rápido.", "author": "María R.", "role": "Emprendedora" } }
+      },
+      "block_order": ["p1"]
+    },
+    "final": { "type": "final-cta", "settings": {} },
+    "bundlerow": {
+      "type": "bundle-builder",
+      "settings": {},
+      "blocks": {
+        "b1": { "type": "fixed", "settings": { "title": "Starter Kit Costura", "audience": "Principiante", "items": "Hilo\nAgujas\nMarcador", "price_note": "Handle: starter-kit-costura", "url": "/products/starter-kit-costura", "cta": "Ver" } },
+        "b2": { "type": "fixed", "settings": { "title": "Kit Emprendimiento", "audience": "Emprendedor", "items": "Hilos\nTijeras", "price_note": "Handle: kit-emprendimiento", "url": "/products/kit-emprendimiento", "cta": "Ver" } },
+        "b3": { "type": "fixed", "settings": { "title": "Kit Taller", "audience": "B2B", "items": "Repuestos\nAgujas ind.", "price_note": "Handle: kit-taller", "url": "/products/kit-taller", "cta": "Ver" } }
+      },
+      "block_order": ["b1", "b2", "b3"]
+    },
+    "footer": { "type": "footer-cro", "settings": { "email": "ventas@tiendaslupe.cl" } }
+  },
+  "order": ["header", "hero", "trust", "segments", "bundles", "bestsellers", "edu", "proof", "final", "bundlerow", "footer"]
+}

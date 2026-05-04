@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "header": {
+      "type": "header-cro",
+      "settings": { "logo_text": "Tiendas Lupe" },
+      "blocks": {
+        "h1": { "type": "link", "settings": { "label": "Insumos", "url": "/collections/insumos-confeccion" } },
+        "h2": { "type": "link", "settings": { "label": "Máquinas", "url": "/collections/maquinas-y-repuestos" } },
+        "h3": { "type": "link", "settings": { "label": "Mayorista", "url": "/pages/compra-por-mayor" } }
+      },
+      "block_order": ["h1", "h2", "h3"]
+    },
+    "main": { "type": "main-product-cro", "settings": {} },
+    "footer": { "type": "footer-cro", "settings": { "email": "ventas@tiendaslupe.cl" } }
+  },
+  "order": ["header", "main", "footer"]
+}

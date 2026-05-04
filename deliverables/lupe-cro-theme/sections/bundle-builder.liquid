@@ -1,0 +1,73 @@
+<section class="lupe-bundlebuilder lupe-container" style="padding:32px 0 64px">
+  <h2 style="margin:0 0 12px;font-size:clamp(22px,3vw,30px)">{{ section.settings.heading }}</h2>
+  <p style="margin:0 0 20px;color:#94a3b8;max-width:720px">{{ section.settings.sub }}</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'fixed' %}
+          <article class="lupe-card" {{ block.shopify_attributes }}>
+            <h3 style="margin:0 0 8px">{{ block.settings.title }}</h3>
+            <p style="margin:0 0 10px;font-size:13px;color:#94a3b8">{{ block.settings.audience }}</p>
+            <ul style="margin:0 0 12px;padding-left:18px;font-size:13px;color:#cbd5e1">
+              {% assign items = block.settings.items | newline_to_br | split: '<br />' %}
+              {% for line in items %}
+                {% if line != blank %}<li>{{ line | strip }}</li>{% endif %}
+              {% endfor %}
+            </ul>
+            <p style="margin:0 0 8px;font-weight:800">{{ block.settings.price_note }}</p>
+            <a class="lupe-btn lupe-btn--primary" style="width:100%;text-align:center" href="{{ block.settings.url }}">{{ block.settings.cta }}</a>
+          </article>
+        {% when 'dynamic' %}
+          <article class="lupe-card" {{ block.shopify_attributes }}>
+            <h3 style="margin:0 0 8px">{{ block.settings.title }}</h3>
+            <p style="margin:0 0 10px;font-size:13px;color:#94a3b8">{{ block.settings.copy }}</p>
+            <a class="lupe-btn lupe-btn--secondary" style="width:100%;text-align:center" href="{{ block.settings.collection }}">Armar desde catálogo</a>
+          </article>
+      {% endcase %}
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Bundle builder CRO",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Bundles fijos y dinámicos" },
+    { "type": "textarea", "id": "sub", "label": "Subtítulo", "default": "Precio volumen y kits listos para principiante, emprendedor y taller." }
+  ],
+  "blocks": [
+    {
+      "type": "fixed",
+      "name": "Bundle fijo",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Título", "default": "Kit Principiante" },
+        { "type": "text", "id": "audience", "label": "Para quién", "default": "Principiante" },
+        { "type": "textarea", "id": "items", "label": "Ítems (una línea c/u)", "default": "Hilo poliéster\nAgujas universales\nDescosedor" },
+        { "type": "text", "id": "price_note", "label": "Precio / ahorro", "default": "Ahorro vs compra separada: consultar en PDP" },
+        { "type": "url", "id": "url", "label": "URL producto bundle", "default": "/products/starter-kit-costura" },
+        { "type": "text", "id": "cta", "label": "CTA", "default": "Ver bundle" }
+      ]
+    },
+    {
+      "type": "dynamic",
+      "name": "Bundle dinámico",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Título", "default": "Arma tu kit" },
+        { "type": "textarea", "id": "copy", "label": "Texto", "default": "Selecciona complementos desde la colección." },
+        { "type": "url", "id": "collection", "label": "URL colección", "default": "/collections/insumos-confeccion" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle builder CRO",
+      "blocks": [
+        { "type": "fixed", "settings": { "title": "Starter Kit Costura", "audience": "Principiante", "items": "Hilo 2000 yd\nAgujas 80/12\nCinta métrica", "price_note": "Bundle: starter-kit-costura", "url": "/products/starter-kit-costura", "cta": "Comprar kit" } },
+        { "type": "fixed", "settings": { "title": "Kit Emprendimiento", "audience": "Emprendedor", "items": "Hilos surtidos\nTijeras\nMarcadores", "price_note": "Bundle: kit-emprendimiento", "url": "/products/kit-emprendimiento", "cta": "Comprar kit" } },
+        { "type": "fixed", "settings": { "title": "Kit Taller", "audience": "B2B", "items": "Repuestos frecuentes\nAgujas industriales", "price_note": "Bundle: kit-taller", "url": "/products/kit-taller", "cta": "Comprar kit" } },
+        { "type": "dynamic", "settings": { "title": "Bundle dinámico", "copy": "Combina insumos y repuestos.", "collection": "/collections/all" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
