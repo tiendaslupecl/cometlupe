@@ -1,0 +1,100 @@
+================================================================================
+TU CARPETA DEL PROYECTO (guárdala):
+================================================================================
+
+  c:\Users\cpich\OneDrive\Escritorio\lupe-shopify-cursor
+
+Todo lo que sigue hacelo DENTRO de esa carpeta.
+
+================================================================================
+PASO 1 — Crear el archivo .env
+================================================================================
+
+1. Abrí la carpeta de arriba en el Explorador de archivos.
+
+2. Copiá el archivo ".env.example" y pegá la copia en la misma carpeta.
+
+3. Renombrá la copia a exactamente:   .env
+
+   Si Windows no deja:
+   - Renombrá a env.txt
+   - Abrilo con Bloc de notas
+   - Menú Archivo → Guardar como…
+   - Tipo: "Todos los archivos (*.*)"
+   - Nombre del archivo: .env
+   - Guardar
+
+4. Abrí ".env" con Bloc de notas y dejá estas dos líneas con TUS datos:
+
+   SHOP_DOMAIN=tu-tienda.myshopify.com
+   ADMIN_API_TOKEN=shpat_(tu_token_completo)
+
+   Guardá.
+
+No compartas el token por chat ni redes.
+
+================================================================================
+PASO 2 — Python (solo si aún no lo tenés)
+================================================================================
+
+https://www.python.org/downloads/
+
+Al instalar, marcá: "Add python.exe to PATH"
+
+================================================================================
+PASO 3 — Ejecutar
+================================================================================
+
+En esa carpeta, hacé DOBLE CLIC en:
+
+  EJECUTAR.bat
+
+Esperá a que termine la ventana negra.
+
+Si terminó bien, debería aparecer el archivo execution_log.json en la misma carpeta.
+
+================================================================================
+Si algo falla
+================================================================================
+
+Si ves errores raros tipo "Lupe no se reconoce" o "ho no se reconoce":
+- NO abras el .bat con Word / Google Docs.
+- Abrilo con Bloc de notas y Guardar como -> Codificacion: ANSI (a veces llamado "UTF-8 sin BOM" tambien sirve).
+
+Volvé a ejecutar EJECUTAR.bat: ahora SIEMPRE crea/edita el archivo:
+
+  SALIDA_ULTIMA_EJECUCION.txt
+
+y lo abre en Bloc de notas al terminar. Ahí vas a ver el error real aunque la ventana se cierre.
+
+Nota: execution_log.json solo aparece si el programa llega al FINAL sin cortarse antes.
+
+Sacá una foto de SALIDA_ULTIMA_EJECUCION.txt y pedí ayuda (tapá el token si aparece).
+
+================================================================================
+ARREGLAR EL MENU (si quedo el menu viejo o vacio)
+================================================================================
+
+1) En Shopify Admin: Configuracion -> Apps y canales de venta -> (tu app "Lupe" o
+   el nombre que le hayas puesto) -> Configuracion de la API de administracion.
+
+2) En "Permisos" / Scopes, busca algo como:
+   "Online store navigation" o "Navegacion de la tienda online"
+   y activa LECTURA y ESCRITURA (read + write).
+
+3) Guarda los cambios y toca "Instalar app" o "Volver a instalar" en la tienda
+   (Shopify a veces pide un token nuevo: copialo al archivo .env).
+
+4) OPCIONAL: en .env podes agregar la linea (con tu web real):
+   STORE_PRIMARY_URL=https://www.tiendaslupe.cl
+
+5) En la carpeta del proyecto, hace doble clic en:
+   SOLO_MENU.bat
+   (asi solo se actualiza el menu, sin volver a correr todo el script largo)
+
+6) Abri la tienda en una ventana de incognito y revisa el menu.
+
+Si SOLO_MENU muestra error de permisos (403), volve al paso 2 y confirma que
+la app tiene "Online store navigation" instalada en ESA misma tienda.
+
+================================================================================
