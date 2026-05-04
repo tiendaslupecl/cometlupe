@@ -3,15 +3,18 @@ Rellena Theme settings → Products → Custom colors (color_swatch_hexes) para 
 
 Xtra infiere swatches para inglés (Red, Black…). Sin mapeo, «Negro» no coincide y el círculo sale blanco/incorrecto.
 
-Lee los valores de la opción de color del producto por GraphQL y aplica hex conocidos; valores sin mapa usan #888888.
+Lee los valores de la opción «Color» de uno o más productos por GraphQL, **fusiona**
+los nombres (sin perder los del hilo 2000 al añadir el 5000) y escribe `color_swatch_hexes`.
+Hex conocidos en SPANISH_COLOR_HEX; el resto reusa hex ya guardado en el tema o #888888.
 
 Requiere: read_themes, write_themes
 
   python tasks/theme_apply_spanish_color_hexes.py
   python tasks/theme_apply_spanish_color_hexes.py --dry-run
 
-Opcional:
-  PRODUCT_HANDLE=otro-producto python tasks/theme_apply_spanish_color_hexes.py
+  python tasks/theme_apply_spanish_color_hexes.py --handles handle-a handle-b
+
+Por defecto fusiona los dos hilos Lama (2000 y 5000 yardas).
 """
 from __future__ import annotations
 
@@ -34,7 +37,10 @@ from shopify_client import API_VERSION, graphql  # noqa: E402
 TOKEN = (os.getenv("ADMIN_API_TOKEN") or "").strip()
 SHOP = (os.getenv("SHOP_DOMAIN") or "").strip().replace("https://", "").split("/")[0]
 
-DEFAULT_HANDLE = "hilo-2000-yardas-lama-40-2-elige-tu-color-poliester-profesional"
+DEFAULT_MERGE_HANDLES = [
+    "hilo-2000-yardas-lama-40-2-elige-tu-color-poliester-profesional",
+    "hilo-de-costura-profesional-lama-5000-yardas-elige-tu-color-29-colores",
+]
 
 # Nombres exactos como en Admin + hex representativo (hilos / tonos tela)
 SPANISH_COLOR_HEX: dict[str, str] = {
@@ -72,6 +78,17 @@ SPANISH_COLOR_HEX: dict[str, str] = {
     "Mostaza": "#D4AF37",
     "Verde Turquesa": "#00CED1",
     "Pistacho": "#93C572",
+    # Hilo 5000 yardas (y otros catálogos)
+    "Morado": "#6B2D5C",
+    "Palo Rosa Claro": "#E8B4BC",
+    "Verde Esmeralda": "#50C878",
+    "Azul Francia": "#1E6AE8",
+    "Verde": "#228B22",
+    "Lila": "#C8A2C8",
+    "Naranja": "#FF8C00",
+    "Rosa Pastel": "#FFD1DC",
+    "Cafe": "#5D4037",
+    "Beige": "#F5F5DC",
 }
 
 QUERY = """
@@ -129,6 +146,20 @@ def _put_asset(theme_id: int, key: str, value: str) -> None:
         raise SystemExit(f"[ERROR] PUT {key}: {r.status_code} {r.text[:600]}")
 
 
+def _parse_hex_blob(blob: str) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for line in (blob or "").splitlines():
+        line = line.strip()
+        if not line or ":" not in line:
+            continue
+        name, _, rest = line.partition(":")
+        name = name.strip()
+        hx = rest.strip().split()[0] if rest.strip() else ""
+        if name and hx.startswith("#"):
+            out[name] = hx
+    return out
+
+
 def _color_option_values(data: dict) -> list[str]:
     p = data.get("productByHandle")
     if not p:
@@ -146,44 +177,62 @@ def _color_option_values(data: dict) -> list[str]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--handles",
+        nargs="*",
+        default=None,
+        metavar="HANDLE",
+        help="Product handles a fusionar (default: hilo 2000 + 5000 yardas)",
+    )
     args = ap.parse_args()
 
     if not TOKEN or not SHOP:
         raise SystemExit("[ERROR] ADMIN_API_TOKEN y SHOP_DOMAIN")
 
-    handle = os.getenv("PRODUCT_HANDLE", "").strip() or DEFAULT_HANDLE
-    pdata = graphql(QUERY, {"handle": handle})
-    p = pdata["productByHandle"]
-    titles = [n["title"] for n in (p.get("variants") or {}).get("nodes") or []]
-
-    values = _color_option_values(pdata)
-    print(f"Producto: {p['title']} ({handle})")
-    print(f"Variantes: {len(titles)} | Valores opción color: {len(values)}")
-    if len(titles) != len(values):
-        print(
-            "[WARN] Cantidad variantes ≠ valores de opción; revisar duplicados o opciones extra."
-        )
-
-    missing_hex = [v for v in values if v not in SPANISH_COLOR_HEX]
-    if missing_hex:
-        print(f"[WARN] Sin hex predefinido para: {missing_hex} → se usará #888888")
-
-    lines = []
-    for v in values:
-        hx = SPANISH_COLOR_HEX.get(v, "#888888")
-        lines.append(f"{v}: {hx}")
-    hex_blob = "\n".join(lines)
+    handles = args.handles
+    if handles is None:
+        env_h = os.getenv("PRODUCT_HANDLE", "").strip()
+        handles = [env_h] if env_h else list(DEFAULT_MERGE_HANDLES)
 
     tid = _theme_main_id()
     raw = _get_asset(tid, "config/settings_data.json")
     sd = json.loads(raw)
     cur = sd.setdefault("current", {})
+    existing_hex = _parse_hex_blob(cur.get("color_swatch_hexes") or "")
+
+    union: list[str] = []
+    for handle in handles:
+        pdata = graphql(QUERY, {"handle": handle})
+        p = pdata["productByHandle"]
+        if not p:
+            raise SystemExit(f"[ERROR] Producto no encontrado: {handle}")
+        titles = [n["title"] for n in (p.get("variants") or {}).get("nodes") or []]
+        values = _color_option_values(pdata)
+        print(f"— {p['title']} ({handle})")
+        print(f"  Variantes: {len(titles)} | valores Color: {len(values)}")
+        if len(titles) != len(values):
+            print("  [WARN] variantes ≠ valores de opción")
+        for v in values:
+            if v not in union:
+                union.append(v)
+
+    missing_hex = [v for v in union if v not in SPANISH_COLOR_HEX and v not in existing_hex]
+    if missing_hex:
+        print(f"[WARN] Sin hex predefinido ni en tema para: {missing_hex} → #888888")
+
+    lines = []
+    for v in union:
+        hx = SPANISH_COLOR_HEX.get(v) or existing_hex.get(v) or "#888888"
+        lines.append(f"{v}: {hx}")
+    hex_blob = "\n".join(lines)
+
     cur["enable_color_swatches"] = True
     cur["color_swatch_name"] = "Color\nColour"
     cur["color_swatch_hexes"] = hex_blob
 
-    print("\nPrimeras líneas color_swatch_hexes:")
-    print("\n".join(lines[:6]) + "\n…")
+    print(f"\nTotal colores únicos en tema: {len(union)}")
+    print("Primeras líneas:")
+    print("\n".join(lines[:8]) + "\n…")
 
     if args.dry_run:
         print("(dry-run)")
