@@ -31,6 +31,22 @@
       },
       {
         "type": "header",
+        "content": "Tiempos de entrega"
+      },
+      {
+        "type": "text",
+        "id": "default_product_deliverytime_in_stock",
+        "label": "Plazo en stock",
+        "default": "2-5 días hábiles"
+      },
+      {
+        "type": "text",
+        "id": "default_product_deliverytime_not_in_stock",
+        "label": "Mensaje sin stock",
+        "default": "Sujeto a reposición — te confirmamos el plazo al procesar el pedido."
+      },
+      {
+        "type": "header",
         "content": "Bundles"
       },
       {
