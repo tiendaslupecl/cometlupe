@@ -29,5 +29,8 @@ There are no automated tests in this repo. The only way to verify end-to-end fun
 ### Gotchas
 
 - `shopify_client.py` raises `SystemExit` at **module import time** if `.env` is missing or credentials are placeholder. Any module that imports from `shopify_client` will trigger this check. To test code that imports `shopify_client`, a `.env` with a valid-format `shpat_*` token must exist.
+- The REST menu API (`/menus.json`) requires the `menus` scope which may not be available on all stores. The code handles this gracefully — `task2_menu.py` falls back to GraphQL `menuUpdate` automatically when REST returns 403. No action needed.
+- The script is **idempotent**: re-running `main.py` updates existing collections, skips already-created redirects, and rebuilds the menu from scratch. It is safe to run multiple times.
+- After execution, `execution_log.json` is written to the repo root with full details (collection GIDs, redirect counts, timestamps). This file is not committed.
 - The `deliverables/` directory contains a full Shopify Liquid theme and product CSV — these are deployment artifacts, not runnable code.
 - The bundled `shopify-comet-electron-final (1).zip` is a separate Node.js/Electron project unrelated to the main Python automation.
