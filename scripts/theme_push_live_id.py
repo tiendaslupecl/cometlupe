@@ -1,14 +1,14 @@
 """
-Sube los archivos del tema CRO al tema live de Shopify vía Admin API (REST Asset).
+Sube archivos del tema CRO a un theme ID de Shopify vía Admin API (REST Asset).
+Por seguridad, bloquea el theme publicado (role=main) salvo override explícito.
 
 Uso:
     python scripts/theme_push_live_id.py <THEME_ID>
 
 Ejemplo:
     python scripts/theme_push_live_id.py 150148677783
+    python scripts/theme_push_live_id.py 150148677783 --allow-live
 """
-import json
-import os
 import sys
 from pathlib import Path
 
@@ -49,9 +49,34 @@ def _collect_assets() -> list[tuple[str, str]]:
     return assets
 
 
-def push_theme(theme_id: str) -> None:
+def _validate_target_theme(theme_id: str, allow_live: bool) -> None:
+    url = f"{REST_BASE}/themes/{theme_id}.json"
+    try:
+        response = _requests.get(url, headers=HEADERS, timeout=30)
+    except _requests.exceptions.RequestException as exc:
+        raise SystemExit(f"❌ No se pudo validar theme {theme_id}: {exc}") from exc
+
+    if response.status_code != 200:
+        raise SystemExit(
+            f"❌ No se pudo validar theme {theme_id} (HTTP {response.status_code}): {response.text[:200]}"
+        )
+
+    theme = response.json().get("theme", {})
+    role = (theme.get("role") or "").strip().lower()
+    name = (theme.get("name") or "").strip()
+    print(f"🧭 Target theme: {name or '(sin nombre)'} | role={role or 'unknown'} | id={theme_id}")
+
+    if role == "main" and not allow_live:
+        raise SystemExit(
+            "🛑 Bloqueado: el theme objetivo es el publicado (role=main). "
+            "Usa un theme de staging o confirma override con --allow-live."
+        )
+
+
+def push_theme(theme_id: str, allow_live: bool = False) -> None:
     total = 0
     errors = 0
+    _validate_target_theme(theme_id, allow_live=allow_live)
     assets = _collect_assets()
     print(f"📦 {len(assets)} archivos encontrados en {THEME_DIR}")
     print(f"🎯 Theme ID: {theme_id}")
@@ -86,6 +111,8 @@ def push_theme(theme_id: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Uso: python scripts/theme_push_live_id.py <THEME_ID>")
+        print("Uso: python scripts/theme_push_live_id.py <THEME_ID> [--allow-live]")
         sys.exit(1)
-    push_theme(sys.argv[1])
+    theme_id_arg = sys.argv[1]
+    allow_live_arg = "--allow-live" in sys.argv[2:]
+    push_theme(theme_id_arg, allow_live=allow_live_arg)

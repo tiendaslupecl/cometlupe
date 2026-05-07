@@ -50,16 +50,22 @@ def find_mixed() -> list[dict]:
         pi = data["products"]["pageInfo"]
 
         for p in products:
-            variants = p["variants"]["nodes"]
-            mgmt_values = {v.get("inventoryManagement") for v in variants}
+            variants = (p.get("variants") or {}).get("nodes") or []
+            mgmt_values = {(v.get("inventoryManagement") or "").strip().lower() for v in variants}
             if len(mgmt_values) > 1:
-                tracked = [v for v in variants if v.get("inventoryManagement") == "shopify"]
-                untracked = [v for v in variants if v.get("inventoryManagement") != "shopify"]
+                tracked = [
+                    v for v in variants
+                    if (v.get("inventoryManagement") or "").strip().lower() == "shopify"
+                ]
+                untracked = [
+                    v for v in variants
+                    if (v.get("inventoryManagement") or "").strip().lower() != "shopify"
+                ]
                 mixed.append({
-                    "id": p["id"],
-                    "title": p["title"],
-                    "handle": p["handle"],
-                    "total_variants": p["totalVariants"],
+                    "id": p.get("id"),
+                    "title": p.get("title") or "(sin título)",
+                    "handle": p.get("handle") or "",
+                    "total_variants": p.get("totalVariants") or len(variants),
                     "tracked": len(tracked),
                     "untracked": len(untracked),
                 })
@@ -75,7 +81,11 @@ def find_mixed() -> list[dict]:
 
 def main() -> None:
     print("🔍 Buscando productos con inventario mixto...\n")
-    results = find_mixed()
+    try:
+        results = find_mixed()
+    except Exception as exc:
+        print(f"❌ Error al consultar Shopify: {exc}")
+        sys.exit(1)
 
     if not results:
         print("\n✅ No se encontraron productos con inventario mixto.")
