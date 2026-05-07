@@ -47,6 +47,7 @@ HEADERS = {
 
 def graphql(query: str, variables: dict | None = None, max_retries: int = 3) -> dict:
     """Ejecuta query GraphQL con reintentos exponenciales."""
+    saw_rate_limit = False
     for attempt in range(max_retries):
         try:
             r = requests.post(
@@ -57,11 +58,13 @@ def graphql(query: str, variables: dict | None = None, max_retries: int = 3) -> 
             )
             
             if r.status_code == 429:
+                saw_rate_limit = True
                 wait = 2 ** attempt
                 print(f"⏳ Rate limited. Esperando {wait}s...")
                 time.sleep(wait)
                 continue
             
+            saw_rate_limit = False
             if r.status_code == 401:
                 raise SystemExit("[ERROR] Token invalido o expirado. Revisa .env")
             
@@ -93,6 +96,11 @@ def graphql(query: str, variables: dict | None = None, max_retries: int = 3) -> 
                 time.sleep(2 ** attempt)
             else:
                 raise
+    if saw_rate_limit:
+        raise Exception(
+            f"GraphQL HTTP 429 persistente tras {max_retries} intentos"
+        )
+    raise Exception("GraphQL: máximo de reintentos excedido sin respuesta válida")
 
 
 def rest(method: str, path: str, payload: dict | None = None, max_retries: int = 3) -> dict:
