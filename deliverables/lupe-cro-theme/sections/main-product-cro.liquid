@@ -59,6 +59,21 @@
         {% assign fbt = collections[section.settings.fbt_collection] %}
         {% render 'frequently-bought', collection: fbt %}
       </div>
+      <div class="lupe-card" style="margin-top:16px;padding:14px">
+        <details open>
+          <summary style="cursor:pointer;font-weight:800">Descripción y compatibilidad</summary>
+          <div style="margin-top:10px;color:#cbd5e1;font-size:14px">{{ product.description }}</div>
+        </details>
+      </div>
+      <div class="lupe-card" style="margin-top:12px;padding:14px">
+        <details>
+          <summary style="cursor:pointer;font-weight:800">Despacho, cambios y devoluciones</summary>
+          <div style="margin-top:10px;color:#cbd5e1;font-size:14px">
+            <p style="margin:0 0 8px">Despacho referencial: {{ settings.default_product_deliverytime_in_stock }}.</p>
+            <p style="margin:0">Cambios y devoluciones dentro de 30 días según políticas vigentes de la tienda.</p>
+          </div>
+        </details>
+      </div>
     </div>
   </div>
 </section>
@@ -95,6 +110,7 @@
   var lowStockEl=document.querySelector('[data-variant-low-stock]');
   var addButton=form.querySelector('[data-add-button]');
   var waBtn=document.querySelector('[data-whatsapp-pdp]');
+  var lastTrackedVariantId=null;
   function toMoney(cents){
     var n=Number(cents||0);
     if(window.Shopify&&typeof window.Shopify.formatMoney==='function'){
@@ -103,6 +119,10 @@
     return '$'+(n/100).toFixed(2);
   }
   function track(name,payload){
+    if(typeof window.lupeTrack==='function'){
+      window.lupeTrack(name,payload||{});
+      return;
+    }
     window.dataLayer=window.dataLayer||[];
     window.dataLayer.push(Object.assign({event:name},payload||{}));
   }
@@ -136,6 +156,15 @@
       addButton.disabled=!v.available;
       addButton.textContent=v.available?'Añadir al carrito':'Sin stock';
     }
+    if(lastTrackedVariantId!==v.id){
+      track('lupe_select_variant',{
+        product_id:{{ product.id | json }},
+        variant_id:v.id,
+        price:Number(v.price||0)/100,
+        available:!!v.available
+      });
+      lastTrackedVariantId=v.id;
+    }
   }
   function sync(){
     var opts=[];
@@ -157,6 +186,11 @@
     });
   }
   sync();
+  track('lupe_view_item',{
+    product_id:{{ product.id | json }},
+    variant_id:hid?hid.value:null,
+    price:Number({{ current_variant.price | json }}||0)/100
+  });
 })();
 </script>
 {% schema %}

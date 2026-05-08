@@ -3,7 +3,18 @@
     "cro_whatsapp_e164": "56963855857",
     "cro_whatsapp_base": "",
     "cro_mayorista_url": "/pages/compra-por-mayor",
-    "cro_bundle_products": [],
+    "cro_discount_3plus_label": "3+ unidades",
+    "cro_discount_3plus_code": "",
+    "cro_discount_10plus_label": "10+ unidades",
+    "cro_discount_10plus_code": "",
+    "cro_bundle_products": [
+      "gid://shopify/Product/9183299633303",
+      "gid://shopify/Product/9183299666071",
+      "gid://shopify/Product/9183299698839",
+      "gid://shopify/Product/9183299731607",
+      "gid://shopify/Product/9183299764375",
+      "gid://shopify/Product/9183299797143"
+    ],
     "default_product_deliverytime_in_stock": "2-5 días hábiles",
     "default_product_deliverytime_not_in_stock": "Sujeto a reposición — te confirmamos el plazo al procesar el pedido."
   }

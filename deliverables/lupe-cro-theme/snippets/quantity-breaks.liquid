@@ -3,12 +3,32 @@
 {%- if raw == blank -%}{%- assign raw = product.metafields.custom.quantity_breaks.value -%}{%- endif -%}
 <div class="lupe-qtybreak lupe-card" style="margin:16px 0;padding:14px">
   <p style="margin:0 0 8px;font-weight:800;font-size:14px">Ahorra comprando más</p>
+  {% assign code_3 = settings.cro_discount_3plus_code | strip %}
+  {% assign code_10 = settings.cro_discount_10plus_code | strip %}
   <table style="width:100%;border-collapse:collapse;font-size:13px">
     <thead><tr><th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155">Cantidad</th><th style="text-align:left;border-bottom:1px solid #334155">Precio / unidad</th></tr></thead>
     <tbody>
       <tr><td style="padding:6px 0">1</td><td>{{ product.selected_or_first_available_variant.price | money }}</td></tr>
-      <tr><td style="padding:6px 0">3+</td><td><span style="color:#cbd5e1">Descuento automático si aplica en checkout.</span></td></tr>
-      <tr><td style="padding:6px 0">10+</td><td><span style="color:var(--lupe-accent,#22c55e);font-weight:700">Precio mayorista</span> <a href="{{ settings.cro_mayorista_url }}" style="color:#38bdf8">Cotizar</a></td></tr>
+      <tr>
+        <td style="padding:6px 0">{{ settings.cro_discount_3plus_label | default: '3+ unidades' }}</td>
+        <td>
+          {% if code_3 != blank %}
+            <a href="/discount/{{ code_3 | url_encode }}?redirect=/cart" style="color:var(--lupe-accent,#22c55e);font-weight:700;text-decoration:none">Aplicar descuento {{ code_3 }}</a>
+          {% else %}
+            <span style="color:#cbd5e1">Configura el código en Theme settings para mostrar oferta real.</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0">{{ settings.cro_discount_10plus_label | default: '10+ unidades' }}</td>
+        <td>
+          {% if code_10 != blank %}
+            <a href="/discount/{{ code_10 | url_encode }}?redirect=/cart" style="color:var(--lupe-accent,#22c55e);font-weight:700;text-decoration:none">Aplicar descuento {{ code_10 }}</a>
+          {% else %}
+            <span style="color:var(--lupe-accent,#22c55e);font-weight:700">Precio mayorista</span> <a href="{{ settings.cro_mayorista_url }}" style="color:#38bdf8">Cotizar</a>
+          {% endif %}
+        </td>
+      </tr>
     </tbody>
   </table>
   {%- if raw != blank -%}

@@ -1,12 +1,28 @@
 <section class="lupe-bundles lupe-container" style="padding:0 0 48px">
+  {% assign bundle_products = section.settings.product_list %}
+  {% if bundle_products == blank or bundle_products.count == 0 %}
+    {% assign bundle_products = settings.cro_bundle_products %}
+  {% endif %}
+  {% assign fallback_collection = collections[section.settings.fallback_collection] %}
+  {% if fallback_collection == blank %}
+    {% assign fallback_collection = collections['insumos-confeccion'] %}
+  {% endif %}
   <div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px">
     <h2 style="margin:0;font-size:clamp(22px,3vw,30px)">{{ section.settings.heading }}</h2>
     <a href="{{ section.settings.collection_url }}" class="lupe-btn lupe-btn--ghost" style="font-size:14px">{{ section.settings.collection_label }}</a>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-    {% for product in section.settings.product_list %}
-      {% render 'bundle-card', card_product: product, show_compare: section.settings.show_compare %}
-    {% endfor %}
+    {% if bundle_products != blank and bundle_products.count > 0 %}
+      {% for product in bundle_products %}
+        {% render 'bundle-card', card_product: product, show_compare: section.settings.show_compare %}
+      {% endfor %}
+    {% elsif fallback_collection and fallback_collection.products_count > 0 %}
+      {% for product in fallback_collection.products limit: section.settings.fallback_limit %}
+        {% render 'bundle-card', card_product: product, show_compare: section.settings.show_compare %}
+      {% endfor %}
+    {% else %}
+      <p style="margin:0;color:#94a3b8">Configura `product_list` de la sección o `cro_bundle_products` en Theme settings para activar bundles.</p>
+    {% endif %}
   </div>
 </section>
 {% schema %}
@@ -16,6 +32,8 @@
   "settings": [
     { "type": "text", "id": "heading", "label": "Título", "default": "Bundles con ahorro" },
     { "type": "product_list", "id": "product_list", "label": "Productos bundle", "limit": 6 },
+    { "type": "collection", "id": "fallback_collection", "label": "Colección fallback" },
+    { "type": "range", "id": "fallback_limit", "label": "Máximo fallback", "min": 3, "max": 12, "step": 1, "default": 6 },
     { "type": "checkbox", "id": "show_compare", "label": "Mostrar precio comparación", "default": true },
     { "type": "url", "id": "collection_url", "label": "Ver más (URL)" },
     { "type": "text", "id": "collection_label", "label": "Texto ver más", "default": "Ver todos los bundles" }

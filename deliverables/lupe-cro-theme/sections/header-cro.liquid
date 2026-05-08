@@ -36,7 +36,7 @@
         {% endcase %}
       {% endfor %}
     </nav>
-    <a href="{{ routes.cart_url }}" class="lupe-btn lupe-btn--secondary" style="padding:.5rem .9rem;font-size:14px">Carrito ({{ cart.item_count }})</a>
+    <a href="{{ routes.cart_url }}" class="lupe-btn lupe-btn--secondary" style="padding:.5rem .9rem;font-size:14px">Carrito (<span data-cart-count>{{ cart.item_count }}</span>)</a>
   </div>
 </header>
 <style>.lupe-mega:focus-within .lupe-mega__panel,.lupe-mega:hover .lupe-mega__panel{display:block!important}</style>

@@ -4,9 +4,20 @@
 {%- if col and col.products_count > 0 -%}
   <div style="margin-top:10px;padding-top:10px;border-top:1px solid #334155">
     <p style="margin:0 0 6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--lupe-accent,#22c55e)">Completa tu compra</p>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
+    <div style="display:grid;gap:8px">
       {% for p in col.products limit: 3 %}
-        <a href="{{ p.url }}" style="font-size:12px;color:#e2e8f0;text-decoration:underline">{{ p.title | truncate: 32 }}</a>
+        {%- assign first_available_variant = p.selected_or_first_available_variant -%}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <a href="{{ p.url }}" style="font-size:12px;color:#e2e8f0;text-decoration:underline">{{ p.title | truncate: 38 }}</a>
+          {% if first_available_variant %}
+            <form method="post" action="{{ routes.cart_add_url }}" data-lupe-quick-add data-source="upsell_inline" data-product-id="{{ p.id }}" style="display:flex;align-items:center;gap:6px">
+              <input type="hidden" name="id" value="{{ first_available_variant.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" data-lupe-quick-add-btn class="lupe-btn lupe-btn--secondary" style="padding:.35rem .75rem;font-size:12px;white-space:nowrap">Añadir</button>
+              <span data-lupe-quick-add-msg style="font-size:11px;color:#86efac;min-width:46px"></span>
+            </form>
+          {% endif %}
+        </div>
       {% endfor %}
     </div>
   </div>
