@@ -2,11 +2,21 @@
 {%- if collection == blank or collection.products_count == 0 -%}
   <p style="margin:0;font-size:14px;color:var(--lupe-muted,#94a3b8)">Configura una colección de complementos.</p>
 {%- else -%}
+  {% assign form_id_prefix = 'LupeFBT-' | append: section.id | append: '-' | append: product.id %}
   <ul style="margin:0;padding:0;list-style:none;display:grid;gap:10px">
     {% for p in collection.products limit: 4 %}
       <li class="lupe-card" style="padding:10px;display:flex;justify-content:space-between;align-items:center;gap:10px">
         <a href="{{ p.url }}" style="color:#f8fafc;text-decoration:none;font-weight:600">{{ p.title }}</a>
-        <a class="lupe-btn lupe-btn--secondary" style="padding:.45rem .9rem;font-size:12px;white-space:nowrap" href="{{ p.url }}">Añadir</a>
+        {%- assign first_available_variant = p.selected_or_first_available_variant -%}
+        {% if first_available_variant %}
+          <form method="post" action="{{ routes.cart_add_url }}" id="{{ form_id_prefix }}-{{ p.id }}">
+            <input type="hidden" name="id" value="{{ first_available_variant.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <button class="lupe-btn lupe-btn--secondary" type="submit" style="padding:.45rem .9rem;font-size:12px;white-space:nowrap">Añadir</button>
+          </form>
+        {% else %}
+          <a class="lupe-btn lupe-btn--ghost" style="padding:.45rem .9rem;font-size:12px;white-space:nowrap" href="{{ p.url }}">Ver</a>
+        {% endif %}
       </li>
     {% endfor %}
   </ul>

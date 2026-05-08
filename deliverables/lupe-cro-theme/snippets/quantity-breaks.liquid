@@ -7,9 +7,14 @@
     <thead><tr><th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155">Cantidad</th><th style="text-align:left;border-bottom:1px solid #334155">Precio / unidad</th></tr></thead>
     <tbody>
       <tr><td style="padding:6px 0">1</td><td>{{ product.selected_or_first_available_variant.price | money }}</td></tr>
-      <tr><td style="padding:6px 0">3+</td><td><span style="color:var(--lupe-accent,#22c55e);font-weight:700">−5% estimado</span> <span style="color:#94a3b8;font-size:11px">(configura descuentos en Admin)</span></td></tr>
-      <tr><td style="padding:6px 0">10+</td><td><span style="color:var(--lupe-accent,#22c55e);font-weight:700">Mayorista</span> <a href="{{ settings.cro_mayorista_url }}" style="color:#38bdf8">Cotizar</a></td></tr>
+      <tr><td style="padding:6px 0">3+</td><td><span style="color:#cbd5e1">Descuento automático si aplica en checkout.</span></td></tr>
+      <tr><td style="padding:6px 0">10+</td><td><span style="color:var(--lupe-accent,#22c55e);font-weight:700">Precio mayorista</span> <a href="{{ settings.cro_mayorista_url }}" style="color:#38bdf8">Cotizar</a></td></tr>
     </tbody>
   </table>
-  {%- if raw != blank -%}<pre style="margin:10px 0 0;white-space:pre-wrap;font-size:12px;color:#cbd5e1">{{ raw }}</pre>{%- endif -%}
+  {%- if raw != blank -%}
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:12px;color:#94a3b8">Ver tabla específica del producto</summary>
+      <pre style="margin:8px 0 0;white-space:pre-wrap;font-size:12px;color:#cbd5e1">{{ raw }}</pre>
+    </details>
+  {%- endif -%}
 </div>

@@ -1,6 +1,7 @@
 <section class="lupe-collection lupe-container" style="padding:24px 0">
   <header style="margin-bottom:20px">
     <h1 style="margin:0 0 8px;font-size:clamp(26px,4vw,40px)">{{ collection.title }}</h1>
+    <p style="margin:0 0 10px;font-size:14px;color:#94a3b8">{{ collection.products_count }} productos</p>
     {% if collection.description != blank %}
       <div style="max-width:800px;color:#cbd5e1;font-size:15px">{{ collection.description }}</div>
     {% endif %}
@@ -16,32 +17,54 @@
     </div>
     <p style="margin:12px 0 0;font-size:12px;color:#64748b">Metafields sugeridos: custom.tipo_tela, custom.tipo_maquina, custom.nivel_usuario, custom.uso — configúralos en Admin y expón filtros en Search & Discovery.</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
-    {% for product in collection.products %}
-      <article class="lupe-card" style="padding:12px;display:flex;flex-direction:column;height:100%">
-        <a href="{{ product.url }}" style="text-decoration:none;color:inherit">
-          {% if product.featured_image %}
-            <img src="{{ product.featured_image | image_url: width: 500 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" width="400" height="400" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:10px">
+  {% paginate collection.products by section.settings.products_per_page %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+      {% for product in collection.products %}
+        <article class="lupe-card" style="padding:12px;display:flex;flex-direction:column;height:100%">
+          <a href="{{ product.url }}" style="text-decoration:none;color:inherit">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 500 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" width="400" height="400" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:10px">
+            {% endif %}
+            <h2 style="margin:0;font-size:16px">{{ product.title }}</h2>
+            <p style="margin:8px 0 0;font-weight:800">{{ product.price_min | money }}{% if product.price_varies %}+{% endif %}</p>
+          </a>
+          <a class="lupe-btn lupe-btn--primary" style="margin-top:auto;text-align:center" href="{{ product.url }}">Ver producto</a>
+        </article>
+      {% endfor %}
+    </div>
+    {% if paginate.pages > 1 %}
+      <nav aria-label="Paginación colección" style="margin-top:20px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+        {% if paginate.previous %}
+          <a href="{{ paginate.previous.url }}" class="lupe-btn lupe-btn--secondary" style="padding:.45rem .9rem">Anterior</a>
+        {% endif %}
+        {% for part in paginate.parts %}
+          {% if part.is_link %}
+            <a href="{{ part.url }}" class="lupe-btn lupe-btn--ghost" style="padding:.45rem .9rem">{{ part.title }}</a>
+          {% else %}
+            <span class="lupe-btn lupe-btn--secondary" style="padding:.45rem .9rem;opacity:{% if part.title == paginate.current_page %}1{% else %}.7{% endif %}">{{ part.title }}</span>
           {% endif %}
-          <h2 style="margin:0;font-size:16px">{{ product.title }}</h2>
-          <p style="margin:8px 0 0;font-weight:800">{{ product.price_min | money }}{% if product.price_varies %}+{% endif %}</p>
-        </a>
-        <a class="lupe-btn lupe-btn--primary" style="margin-top:auto;text-align:center" href="{{ product.url }}">Ver producto</a>
-      </article>
-    {% endfor %}
-  </div>
+        {% endfor %}
+        {% if paginate.next %}
+          <a href="{{ paginate.next.url }}" class="lupe-btn lupe-btn--secondary" style="padding:.45rem .9rem">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% endpaginate %}
 </section>
 {% schema %}
 {
-  "name": "Colección CRO + filtros URL",
+  "name": "Colección CRO filtros",
   "tag": "section",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Productos por página", "min": 12, "max": 48, "step": 4, "default": 24 }
+  ],
   "blocks": [
     {
       "type": "filter",
       "name": "Filtro URL",
       "settings": [
         { "type": "text", "id": "label", "label": "Etiqueta", "default": "Mezclilla" },
-        { "type": "url", "id": "url", "label": "URL con filtro", "default": "/collections/all?filter.p.m.custom.tipo_tela=mezclilla" }
+        { "type": "url", "id": "url", "label": "URL con filtro" }
       ]
     }
   ],

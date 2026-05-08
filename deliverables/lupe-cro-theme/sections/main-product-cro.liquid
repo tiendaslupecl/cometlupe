@@ -14,10 +14,20 @@
       <h1 style="margin:0 0 8px;font-size:clamp(24px,4vw,34px)">{{ product.title }}</h1>
       <p style="margin:0 0 12px;color:#94a3b8">{{ product.vendor }}</p>
       {% render 'trust-badges' %}
-      <div style="font-size:28px;font-weight:900;margin:12px 0">{{ current_variant.price | money }}</div>
-      {%- if current_variant.inventory_quantity <= section.settings.low_stock_threshold and current_variant.inventory_management -%}
-        <p style="margin:0 0 12px;color:#fbbf24;font-weight:700">Quedan pocas unidades: {{ current_variant.inventory_quantity }}</p>
-      {%- endif -%}
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin:12px 0">
+        <span data-variant-price style="font-size:28px;font-weight:900">{{ current_variant.price | money }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span data-variant-compare style="font-size:17px;color:#94a3b8;text-decoration:line-through">{{ current_variant.compare_at_price | money }}</span>
+        {% else %}
+          <span data-variant-compare style="display:none;font-size:17px;color:#94a3b8;text-decoration:line-through"></span>
+        {% endif %}
+      </div>
+      <p data-variant-availability style="margin:0 0 8px;font-size:14px;color:#86efac;font-weight:700">
+        {% if current_variant.available %}Disponible para compra{% else %}Sin stock por ahora{% endif %}
+      </p>
+      <p data-variant-low-stock data-low-stock-threshold="{{ section.settings.low_stock_threshold }}" style="{% if current_variant.inventory_management and current_variant.inventory_quantity <= section.settings.low_stock_threshold and current_variant.inventory_quantity >= 0 %}display:block{% else %}display:none{% endif %};margin:0 0 12px;color:#fbbf24;font-weight:700">
+        Quedan pocas unidades: {% if current_variant.inventory_quantity >= 0 %}{{ current_variant.inventory_quantity }}{% endif %}
+      </p>
       {% form 'product', product, id: 'LupeProductForm', class: 'lupe-product-form' %}
         {% unless product.has_only_default_variant %}
           <div style="margin-bottom:12px">
@@ -34,8 +44,10 @@
         <input type="hidden" name="id" value="{{ current_variant.id }}">
         <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">Cantidad</label>
         <input name="quantity" type="number" min="1" value="1" style="width:120px;padding:10px;border-radius:10px;background:#0f172a;color:#f8fafc;border:1px solid #334155;margin-bottom:12px">
-        <button type="submit" name="add" class="lupe-btn lupe-btn--primary" style="width:100%;margin-bottom:10px">Añadir al carrito</button>
-        <a class="lupe-btn lupe-btn--ghost" style="width:100%;text-align:center" href="https://wa.me/{{ settings.cro_whatsapp_e164 }}?text={{ section.settings.wa_msg | append: ' ' | append: product.title | append: ' ' | append: request.origin | append: product.url | url_encode }}" target="_blank" rel="noopener">WhatsApp: consultar este producto</a>
+        <button type="submit" name="add" class="lupe-btn lupe-btn--primary" data-add-button style="width:100%;margin-bottom:10px" {% unless current_variant.available %}disabled{% endunless %}>
+          {% if current_variant.available %}Añadir al carrito{% else %}Sin stock{% endif %}
+        </button>
+        <a class="lupe-btn lupe-btn--ghost" data-whatsapp-pdp style="width:100%;text-align:center" href="https://wa.me/{{ settings.cro_whatsapp_e164 }}?text={{ section.settings.wa_msg | append: ' ' | append: product.title | append: ' ' | append: request.origin | append: product.url | url_encode }}" target="_blank" rel="noopener">WhatsApp: consultar este producto</a>
       {% endform %}
       {% render 'quantity-breaks', product: product %}
       <div class="lupe-card" style="margin-top:16px;padding:14px">
@@ -54,7 +66,7 @@
   <div class="lupe-container" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
     <div>
       <p style="margin:0;font-weight:800;font-size:14px">{{ product.title | truncate: 48 }}</p>
-      <p style="margin:0;font-size:13px;color:#94a3b8">{{ current_variant.price | money }}</p>
+      <p data-sticky-price style="margin:0;font-size:13px;color:#94a3b8">{{ current_variant.price | money }}</p>
     </div>
     <button type="submit" form="LupeProductForm" class="lupe-btn lupe-btn--primary">Comprar</button>
   </div>
@@ -62,6 +74,7 @@
 <script type="application/json" id="lupe-variant-json">{{ product.variants | json }}</script>
 <script>
 (function(){
+  var moneyFormat={{ shop.money_format | json }};
   var pdp=document.querySelector('[data-pdp]');
   var bar=document.getElementById('lupe-sticky-atc');
   if(pdp&&bar){
@@ -75,6 +88,55 @@
   if(!form||!el)return;
   var variants=JSON.parse(el.textContent);
   var hid=form.querySelector('input[name="id"]');
+  var priceEl=document.querySelector('[data-variant-price]');
+  var compareEl=document.querySelector('[data-variant-compare]');
+  var stickyPriceEl=document.querySelector('[data-sticky-price]');
+  var availabilityEl=document.querySelector('[data-variant-availability]');
+  var lowStockEl=document.querySelector('[data-variant-low-stock]');
+  var addButton=form.querySelector('[data-add-button]');
+  var waBtn=document.querySelector('[data-whatsapp-pdp]');
+  function toMoney(cents){
+    var n=Number(cents||0);
+    if(window.Shopify&&typeof window.Shopify.formatMoney==='function'){
+      return window.Shopify.formatMoney(n,moneyFormat);
+    }
+    return '$'+(n/100).toFixed(2);
+  }
+  function track(name,payload){
+    window.dataLayer=window.dataLayer||[];
+    window.dataLayer.push(Object.assign({event:name},payload||{}));
+  }
+  function renderVariant(v){
+    if(!v)return;
+    if(hid)hid.value=v.id;
+    if(priceEl)priceEl.textContent=toMoney(v.price);
+    if(stickyPriceEl)stickyPriceEl.textContent=toMoney(v.price);
+    if(compareEl){
+      var cmp=Number(v.compare_at_price||0);
+      if(cmp>Number(v.price||0)){
+        compareEl.textContent=toMoney(cmp);
+        compareEl.style.display='inline';
+      }else{
+        compareEl.textContent='';
+        compareEl.style.display='none';
+      }
+    }
+    if(availabilityEl){
+      availabilityEl.textContent=v.available?'Disponible para compra':'Sin stock por ahora';
+      availabilityEl.style.color=v.available?'#86efac':'#fca5a5';
+    }
+    if(lowStockEl){
+      var threshold=Number(lowStockEl.getAttribute('data-low-stock-threshold')||0);
+      var qty=Number(v.inventory_quantity);
+      var show=v.inventory_management&&qty>=0&&qty<=threshold;
+      lowStockEl.style.display=show?'block':'none';
+      lowStockEl.textContent=show?'Quedan pocas unidades: '+qty:'';
+    }
+    if(addButton){
+      addButton.disabled=!v.available;
+      addButton.textContent=v.available?'Añadir al carrito':'Sin stock';
+    }
+  }
   function sync(){
     var opts=[];
     form.querySelectorAll('select[name^="options"]').forEach(function(s){opts.push(s.value);});
@@ -83,9 +145,18 @@
       for(var i=0;i<opts.length;i++){ if(String(o[i])!==String(opts[i])) return false; }
       return o.length===opts.length;
     });
-    if(found&&hid)hid.value=found.id;
+    renderVariant(found);
   }
   form.addEventListener('change',sync);
+  form.addEventListener('submit',function(){
+    track('lupe_add_to_cart_click',{product_id:{{ product.id | json }},variant_id:hid?hid.value:null});
+  });
+  if(waBtn){
+    waBtn.addEventListener('click',function(){
+      track('lupe_whatsapp_pdp_click',{product_id:{{ product.id | json }}});
+    });
+  }
+  sync();
 })();
 </script>
 {% schema %}

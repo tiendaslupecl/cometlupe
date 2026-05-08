@@ -17,20 +17,30 @@
   </button>
   <div class="wa-float__panel" id="wa-float-panel" hidden data-wa-panel>
     <p class="wa-float__title">¿Cómo te ayudamos?</p>
-    <a class="wa-float__link" href="{{ wa_url }}?text={{ 'Soy principiante y necesito orientación para comprar en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Principiante</a>
-    <a class="wa-float__link" href="{{ wa_url }}?text={{ 'Emprendo en costura y quiero escalar compras en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Emprendedor</a>
-    <a class="wa-float__link" href="{{ wa_url }}?text={{ 'Tengo taller B2B: cotización y stock en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Taller (B2B)</a>
+    <a class="wa-float__link" data-wa-segment="principiante" href="{{ wa_url }}?text={{ 'Soy principiante y necesito orientación para comprar en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Principiante</a>
+    <a class="wa-float__link" data-wa-segment="emprendedor" href="{{ wa_url }}?text={{ 'Emprendo en costura y quiero escalar compras en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Emprendedor</a>
+    <a class="wa-float__link" data-wa-segment="taller_b2b" href="{{ wa_url }}?text={{ 'Tengo taller B2B: cotización y stock en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Taller (B2B)</a>
   </div>
 </div>
 <script>
 (function(){
   var b=document.querySelector('[data-wa-toggle]');
   var p=document.querySelector('[data-wa-panel]');
+  var links=document.querySelectorAll('[data-wa-segment]');
   if(!b||!p)return;
+  function track(eventName,payload){
+    window.dataLayer=window.dataLayer||[];
+    window.dataLayer.push(Object.assign({event:eventName},payload||{}));
+  }
   b.addEventListener('click',function(){
     var o=b.getAttribute('aria-expanded')==='true';
     b.setAttribute('aria-expanded',o?'false':'true');
     p.hidden=o;
+  });
+  links.forEach(function(link){
+    link.addEventListener('click',function(){
+      track('lupe_whatsapp_float_click',{segment:link.getAttribute('data-wa-segment')});
+    });
   });
 })();
 </script>

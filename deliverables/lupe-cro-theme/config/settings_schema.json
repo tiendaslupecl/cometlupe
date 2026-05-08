@@ -26,8 +26,7 @@
       {
         "type": "url",
         "id": "cro_mayorista_url",
-        "label": "Página mayorista",
-        "default": "/pages/compra-por-mayor"
+        "label": "Página mayorista"
       },
       {
         "type": "header",
