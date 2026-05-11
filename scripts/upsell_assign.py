@@ -17,117 +17,165 @@ sys.path.insert(0, str(_ROOT))
 from shopify_client import REST_BASE, HEADERS
 import requests
 
-# ── Prioridad: cuando un producto está en varias colecciones, se usa la primera
-# que aparezca en esta lista. Colecciones más específicas van primero.
+# ═══════════════════════════════════════════════════════════════════════════════
+# GRUPOS DE TÉCNICA — cross-sell solo dentro del mismo grupo
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── Grupo 1: Costura Máquina Casera ──────────────────────────────────────────
+# aguja casera ↔ hilos caseros ↔ prensatelas caseros ↔ repuestos
+
+# ── Grupo 2: Costura Máquina Industrial ──────────────────────────────────────
+# aguja industrial ↔ hilo overlock ↔ prensatelas industriales
+
+# ── Grupo 3: Bordado ──────────────────────────────────────────────────────────
+# hilos bordar ↔ bastidores ↔ agujas mano
+
+# ── Grupo 4: Tejido / Crochet ─────────────────────────────────────────────────
+# lanas ↔ agujas crochet/palillos ↔ trapillo
+
+# ── Grupo 5: Insumos Confección ───────────────────────────────────────────────
+# cierres ↔ entretelas ↔ elasticos ↔ botones ↔ sesgo ↔ broches
+
+# ── Grupo 6: Herramientas de Corte ────────────────────────────────────────────
+# tijeras ↔ herramientas ↔ cortadoras ↔ repuestos cortadoras
+
+# ── Grupo 7: Decoración / Manualidades ───────────────────────────────────────
+# bisutería ↔ lentejuelas ↔ pasamanería ↔ cordones ↔ tinturas
+
+# Prioridad: colección más específica gana cuando un producto pertenece a varias
 PRIORITY = [
-    # Hilos (específicos primero)
-    "hilos-bordar-profesionales",
-    "hilo-overlock",
-    "hilo-de-saco",
-    "hilo-poliamida",
+    # G1 - Casera (hilos primero para que un hilo no sea confundido con aguja)
     "hilo-5000",
     "hilo-2000",
-    # Agujas
-    "agujas-crochet-y-tejido",
-    "agujas-mano",
-    "aguja-maquina-industrial",
     "aguja-maquina-casera",
-    # Prensatelas
+    "prensatelas-caseros",
+    "prensatelas-para-maquina-de-cos",
+    # G2 - Industrial
+    "hilo-overlock",
+    "hilo-poliamida",
+    "hilo-de-saco",
+    "aguja-maquina-industrial",
     "prensatelas-industriales-1",
     "prensatelas-industriales",
-    "prensatelas-para-maquina-de-cos",
-    "prensatelas-caseros",
-    # Repuestos / Máquinas
-    "repuestos-de-cortadoras-de-telas",
-    "cortadoras-de-tela-circulares",
-    "repuestos-maquinas-de-coser",
-    "maquinas-y-repuestos",
-    "accesorios-maquina",
-    # Bordado
+    # G3 - Bordado
+    "hilos-bordar-profesionales",
     "bastidores-bordado",
-    # Tejido / Crochet / Lanas
+    "agujas-mano",
+    # G4 - Tejido / Crochet
     "lanas-ovillos-crochet-tejido",
+    "agujas-crochet-y-tejido",
     "crochet-accessories-ganchillos",
     "trapillo-telas-crochet",
-    "tejido-y-manualidades",
-    "tejido-manualidades",
-    # Resto
+    # G5 - Insumos confección
+    "cierres",
+    "entretelas",
+    "elasticos-costura",
+    "botones",
+    "sesgo-bies",
+    "broches",
+    "hebillas",
+    "velcro",
+    "adhesivos-telas",
+    "cintas-algodon",
+    "cintas-satin",
+    "huincha-mochila",
+    "alfileres",
+    # G6 - Herramientas
+    "cortadoras-de-tela-circulares",
+    "repuestos-de-cortadoras-de-telas",
+    "tijeras-profesionales-para-costura",
+    "herramientas-de-costura",
+    "herramientas-costura",
+    "herramientas",
+    # G7 - Decoración / Manualidades
+    "bisuteria-y-decoracion",
+    "bisuteria-decoracion",
+    "lentejuelas-y-strass",
+    "pasamaneria",
+    "flecos-decorativos",
+    "cascabeles-costura-manualidades",
+    "argollas-manualidades",
+    "cuencas-madera",
+    "macrame-cordon-trenzado",
+    "cordones-zapatos-costura-manualidades",
+    "tinturas",
+    "tinturas-y-pegamentos",
+    "tinturas-pegamentos",
+    # Máquinas / repuestos / planchas
+    "maquinas-y-repuestos",
+    "accesorios-maquina",
+    "repuestos-maquinas-de-coser",
+    "planchas-a-vapor-industrial",
 ]
 
-# ── Cross-sell map: si el producto está en esta colección → mostrar esta otra ─
-# Lógica: complementos naturales de venta cruzada
 CROSS_SELL = {
-    # Agujas → Hilos y viceversa
-    "aguja-maquina-casera":             "hilo-2000",
-    "aguja-maquina-industrial":         "hilo-overlock",
-    "agujas-mano":                      "hilo-2000",
-    "agujas-crochet-y-tejido":          "lanas-ovillos-crochet-tejido",
+    # ── G1: Costura Máquina Casera ──────────────────────────────────────────
     "hilo-2000":                        "aguja-maquina-casera",
     "hilo-5000":                        "aguja-maquina-casera",
-    "hilo-overlock":                    "aguja-maquina-industrial",
-    "hilo-de-saco":                     "agujas-mano",
-    "hilo-poliamida":                   "aguja-maquina-industrial",
-    "hilos-bordar-profesionales":       "bastidores-bordado",
-    # Prensatelas → Agujas y repuestos
+    "aguja-maquina-casera":             "hilo-2000",
     "prensatelas-caseros":              "aguja-maquina-casera",
-    "prensatelas-para-maquina-de-cos":  "aguja-maquina-casera",
-    "prensatelas-industriales":         "aguja-maquina-industrial",
-    "prensatelas-industriales-1":       "aguja-maquina-industrial",
-    # Repuestos / Máquinas → Agujas
+    "prensatelas-para-maquina-de-cos":  "hilo-2000",
     "repuestos-maquinas-de-coser":      "aguja-maquina-casera",
-    "maquinas-y-repuestos":             "accesorios-maquina",
     "accesorios-maquina":               "aguja-maquina-casera",
-    # Cortadoras ↔ Repuestos
-    "cortadoras-de-tela-circulares":    "repuestos-de-cortadoras-de-telas",
-    "repuestos-de-cortadoras-de-telas": "cortadoras-de-tela-circulares",
-    # Tijeras / Herramientas → Agujas
-    "tijeras-profesionales-para-costura": "herramientas-de-costura",
-    "herramientas-de-costura":          "aguja-maquina-casera",
-    "herramientas-costura":             "aguja-maquina-casera",
-    "herramientas":                     "aguja-maquina-casera",
-    # Cierres / Elásticos / Botones
-    "cierres":                          "herramientas-de-costura",
+    "maquinas-y-repuestos":             "repuestos-maquinas-de-coser",
+
+    # ── G2: Costura Máquina Industrial ──────────────────────────────────────
+    "hilo-overlock":                    "aguja-maquina-industrial",
+    "hilo-poliamida":                   "aguja-maquina-industrial",
+    "hilo-de-saco":                     "aguja-maquina-industrial",
+    "aguja-maquina-industrial":         "hilo-overlock",
+    "prensatelas-industriales":         "aguja-maquina-industrial",
+    "prensatelas-industriales-1":       "hilo-overlock",
+
+    # ── G3: Bordado ──────────────────────────────────────────────────────────
+    "hilos-bordar-profesionales":       "bastidores-bordado",
+    "bastidores-bordado":               "hilos-bordar-profesionales",
+    "agujas-mano":                      "hilos-bordar-profesionales",
+
+    # ── G4: Tejido / Crochet ─────────────────────────────────────────────────
+    "lanas-ovillos-crochet-tejido":     "agujas-crochet-y-tejido",
+    "agujas-crochet-y-tejido":          "lanas-ovillos-crochet-tejido",
+    "crochet-accessories-ganchillos":   "lanas-ovillos-crochet-tejido",
+    "trapillo-telas-crochet":           "agujas-crochet-y-tejido",
+
+    # ── G5: Insumos Confección ───────────────────────────────────────────────
+    "cierres":                          "entretelas",
+    "entretelas":                       "cierres",
+    "adhesivos-telas":                  "entretelas",
     "elasticos-costura":                "botones",
     "botones":                          "elasticos-costura",
     "broches":                          "botones",
-    "hebillas":                         "herramientas-de-costura",
+    "hebillas":                         "elasticos-costura",
     "velcro":                           "elasticos-costura",
-    # Bordado / Bastidores
-    "bastidores-bordado":               "hilos-bordar-profesionales",
-    # Tejido / Crochet / Lanas
-    "lanas-ovillos-crochet-tejido":     "agujas-crochet-y-tejido",
-    "crochet-accessories-ganchillos":   "lanas-ovillos-crochet-tejido",
-    "trapillo-telas-crochet":           "agujas-crochet-y-tejido",
-    "tejido-y-manualidades":            "lanas-ovillos-crochet-tejido",
-    "tejido-manualidades":              "lanas-ovillos-crochet-tejido",
-    # Entretelas / Adhesivos
-    "entretelas":                       "herramientas-de-costura",
-    "adhesivos-telas":                  "entretelas",
-    # Cintas / Sesgo / Pasamanería
-    "sesgo-bies":                       "herramientas-de-costura",
-    "pasamaneria":                      "herramientas-de-costura",
-    "cintas-algodon":                   "herramientas-de-costura",
-    "cintas-satin":                     "herramientas-de-costura",
-    "huincha-mochila":                  "herramientas-de-costura",
-    "macrame-cordon-trenzado":          "herramientas",
-    "cordones-zapatos-costura-manualidades": "herramientas",
-    # Tinturas
-    "tinturas":                         "herramientas-de-costura",
-    "tinturas-y-pegamentos":            "herramientas-de-costura",
-    "tinturas-pegamentos":              "herramientas-de-costura",
-    # Bisutería / Decoración / Manualidades
-    "bisuteria-y-decoracion":           "materiales-para-manualidades",
-    "bisuteria-decoracion":             "materiales-para-manualidades",
-    "lentejuelas-y-strass":             "materiales-para-manualidades",
-    "flecos-decorativos":               "pasamaneria",
-    "cascabeles-costura-manualidades":  "materiales-para-manualidades",
-    "argollas-manualidades":            "materiales-para-manualidades",
-    "cuencas-madera":                   "materiales-para-manualidades",
-    "materiales-para-manualidades":     "agujas-crochet-y-tejido",
-    # Alfileres
+    "sesgo-bies":                       "cierres",
+    "cintas-algodon":                   "sesgo-bies",
+    "cintas-satin":                     "sesgo-bies",
+    "huincha-mochila":                  "elasticos-costura",
     "alfileres":                        "herramientas-de-costura",
-    # Planchas industriales
+
+    # ── G6: Herramientas de Corte ────────────────────────────────────────────
+    "cortadoras-de-tela-circulares":    "repuestos-de-cortadoras-de-telas",
+    "repuestos-de-cortadoras-de-telas": "cortadoras-de-tela-circulares",
+    "tijeras-profesionales-para-costura": "herramientas-de-costura",
+    "herramientas-de-costura":          "tijeras-profesionales-para-costura",
+    "herramientas-costura":             "tijeras-profesionales-para-costura",
+    "herramientas":                     "tijeras-profesionales-para-costura",
     "planchas-a-vapor-industrial":      "herramientas-de-costura",
+
+    # ── G7: Decoración / Manualidades ────────────────────────────────────────
+    "bisuteria-y-decoracion":           "lentejuelas-y-strass",
+    "bisuteria-decoracion":             "lentejuelas-y-strass",
+    "lentejuelas-y-strass":             "bisuteria-y-decoracion",
+    "flecos-decorativos":               "pasamaneria",
+    "pasamaneria":                      "flecos-decorativos",
+    "cascabeles-costura-manualidades":  "bisuteria-y-decoracion",
+    "argollas-manualidades":            "bisuteria-y-decoracion",
+    "cuencas-madera":                   "bisuteria-y-decoracion",
+    "macrame-cordon-trenzado":          "cordones-zapatos-costura-manualidades",
+    "cordones-zapatos-costura-manualidades": "macrame-cordon-trenzado",
+    "tinturas":                         "herramientas-de-costura",
+    "tinturas-y-pegamentos":            "tinturas",
+    "tinturas-pegamentos":              "tinturas",
 }
 
 # Sin match específico → no asignar (evita mezclar catálogo completo)
