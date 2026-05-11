@@ -22,6 +22,99 @@
     {{ content_for_layout }}
   </main>
   {% render 'whatsapp-float', phone: settings.cro_whatsapp_e164, brand: shop.name %}
-  <script>document.documentElement.className=document.documentElement.className.replace('no-js','js');</script>
+  <script>
+    document.documentElement.className=document.documentElement.className.replace('no-js','js');
+    window.dataLayer=window.dataLayer||[];
+    window.lupeTrack=window.lupeTrack||function(eventName,payload){
+      window.dataLayer.push(Object.assign({event:eventName},payload||{}));
+    };
+    (function(){
+      function parseNumber(value){
+        var n=Number(value);
+        return Number.isFinite(n)?n:null;
+      }
+      function updateCartCount(count){
+        if(count===null||count===undefined)return;
+        document.querySelectorAll('[data-cart-count]').forEach(function(node){
+          node.textContent=String(count);
+        });
+      }
+      document.addEventListener('click',function(ev){
+        var checkoutLink=ev.target.closest('a[href*="/checkout"]');
+        if(checkoutLink){
+          window.lupeTrack('lupe_begin_checkout_click',{source:'link',href:checkoutLink.getAttribute('href')});
+        }
+        var trackedItem=ev.target.closest('[data-track-select-item]');
+        if(trackedItem){
+          window.lupeTrack('lupe_select_item',{
+            product_id:parseNumber(trackedItem.getAttribute('data-product-id')),
+            product_title:trackedItem.getAttribute('data-product-title')||'',
+            price:parseNumber(trackedItem.getAttribute('data-product-price')),
+            source:trackedItem.getAttribute('data-source')||''
+          });
+        }
+      });
+      document.addEventListener('submit',function(ev){
+        var form=ev.target;
+        if(!(form instanceof HTMLFormElement))return;
+        if(form.matches('form[action*="/cart"]')&&form.querySelector('[name="checkout"]')){
+          window.lupeTrack('lupe_begin_checkout_click',{source:'cart_form'});
+        }
+        if(form.hasAttribute('data-lupe-quick-add')){
+          ev.preventDefault();
+          var idField=form.querySelector('input[name="id"]');
+          var qtyField=form.querySelector('input[name="quantity"]');
+          var btn=form.querySelector('[data-lupe-quick-add-btn]');
+          var msg=form.querySelector('[data-lupe-quick-add-msg]');
+          var variantId=idField?idField.value:'';
+          var quantity=qtyField?parseInt(qtyField.value||'1',10):1;
+          if(!variantId||quantity<1)return;
+          if(btn){
+            btn.disabled=true;
+            btn.setAttribute('data-original-label',btn.textContent);
+            btn.textContent='Agregando…';
+          }
+          fetch('/cart/add.js',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Accept':'application/json'},
+            body:JSON.stringify({id:variantId,quantity:quantity})
+          })
+          .then(function(resp){
+            if(!resp.ok){ throw new Error('quick_add_failed'); }
+            return resp.json();
+          })
+          .then(function(item){
+            if(msg){ msg.textContent='Añadido'; }
+            window.lupeTrack('lupe_add_to_cart',{
+              source:form.getAttribute('data-source')||'quick_add',
+              product_id:parseNumber(form.getAttribute('data-product-id')),
+              variant_id:parseNumber(item&&item.variant_id),
+              quantity:quantity
+            });
+            return fetch('/cart.js',{headers:{'Accept':'application/json'}});
+          })
+          .then(function(resp){
+            if(!resp||!resp.ok)return null;
+            return resp.json();
+          })
+          .then(function(cart){
+            if(cart&&typeof cart.item_count==='number'){
+              updateCartCount(cart.item_count);
+            }
+          })
+          .catch(function(){
+            if(msg){ msg.textContent='Error al añadir'; }
+          })
+          .finally(function(){
+            if(btn){
+              var label=btn.getAttribute('data-original-label')||'Añadir';
+              btn.textContent=label;
+              btn.disabled=false;
+            }
+          });
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
