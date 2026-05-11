@@ -130,7 +130,19 @@ CROSS_SELL = {
     "planchas-a-vapor-industrial":      "herramientas-de-costura",
 }
 
-DEFAULT_UPSELL = "top-65-favoritos"
+# Sin match específico → no asignar (evita mezclar catálogo completo)
+DEFAULT_UPSELL = None
+
+# Colecciones genéricas que no sirven para cross-sell — ignorar al hacer match
+EXCLUDE_FROM_MATCHING = {
+    "top-65-favoritos",
+    "catalogo-completo",
+    "insumos-de-confeccion",
+    "insumos-confeccion",
+    "materiales-para-manualidades",
+    "tejido-y-manualidades",
+    "tejido-manualidades",
+}
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -187,14 +199,16 @@ print(f"   {total_rels} relaciones (manual + smart)")
 # ── Asignar upsell ─────────────────────────────────────────────────────────────
 
 def best_upsell_handle(product_id: int) -> str | None:
-    handles = set(prod_cols.get(product_id, []))
+    handles = set(prod_cols.get(product_id, [])) - EXCLUDE_FROM_MATCHING
     # Revisar primero en orden de PRIORITY, luego el resto
     ordered = [h for h in PRIORITY if h in handles] + [h for h in handles if h not in PRIORITY]
     for h in ordered:
         target = CROSS_SELL.get(h)
         if target and target in cols_by_handle:
             return target
-    return DEFAULT_UPSELL if DEFAULT_UPSELL in cols_by_handle else None
+    if DEFAULT_UPSELL and DEFAULT_UPSELL in cols_by_handle:
+        return DEFAULT_UPSELL
+    return None
 
 
 plan = []
