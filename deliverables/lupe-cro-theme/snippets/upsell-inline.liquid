@@ -1,6 +1,7 @@
 {% doc %} Upsell inline bajo producto host: usa colección metafield custom.upsell_collection {% enddoc %}
-{%- assign col = host.metafields.custom.upsell_collection.value -%}
-{%- if col == blank -%}{% assign col = collections['insumos-confeccion'] %}{%- endif -%}
+{%- assign upsell_handle = host.metafields.custom.upsell_collection -%}
+{%- assign col = collections[upsell_handle] -%}
+{%- if col == blank -%}{%- assign col = blank -%}{%- endif -%}
 {%- if col and col.products_count > 0 -%}
   <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0">
     <p style="margin:0 0 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#16a34a">Completa tu compra</p>

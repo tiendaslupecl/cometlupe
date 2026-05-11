@@ -356,7 +356,7 @@ if args.dry_run or not args.apply:
 print("🚀 Aplicando metafields...")
 ok = err = 0
 for p, col in plan:
-    col_gid = f"gid://shopify/Collection/{col['id']}"
+    col_handle = col["handle"]
 
     # Buscar si ya existe el metafield
     existing = requests.get(
@@ -371,7 +371,7 @@ for p, col in plan:
         r = requests.put(
             f"{REST_BASE}/products/{p['id']}/metafields/{mf_id}.json",
             headers=HEADERS,
-            json={"metafield": {"id": mf_id, "value": col_gid}},
+            json={"metafield": {"id": mf_id, "value": col_handle, "type": "single_line_text_field"}},
             timeout=30,
         )
         verb = "↩️ "
@@ -382,8 +382,8 @@ for p, col in plan:
             json={"metafield": {
                 "namespace": "custom",
                 "key": "upsell_collection",
-                "type": "collection_reference",
-                "value": col_gid,
+                "type": "single_line_text_field",
+                "value": col_handle,
                 "owner_id": p["id"],
                 "owner_resource": "product",
             }},
