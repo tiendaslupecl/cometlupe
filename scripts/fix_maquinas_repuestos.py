@@ -66,7 +66,7 @@ RULES = [
     (["herramienta manual", "herramienta para costura", "reach para"],
                                                         "herramientas-de-costura"),
     # Cierres
-    (["cierre", "cremallera", "diente de perro"],       "cierres-cremalleras"),
+    (["cierre", "cremallera", "diente de perro"],       "cierres-y-cremalleras-para-costura"),
     # Cortadoras
     (["cortadora", "cuchilla cortadora", "repuesto cortadora"],
                                                         "cortadoras-de-tela-circulares"),
