@@ -166,18 +166,22 @@ print("🔍 Obteniendo productos...")
 products = paginate("products.json", "products", fields="id,title,handle")
 print(f"   {len(products)} productos")
 
-print("🔍 Obteniendo relaciones producto↔colección (collects)...")
-collects = paginate("collects.json", "collects", fields="product_id,collection_id")
-print(f"   {len(collects)} relaciones")
-print()
-
-# Mapa: product_id → [collection_handles]
+# collects.json solo cubre colecciones manuales; para smart collections
+# hay que consultar cada colección individualmente.
+print("🔍 Mapeando productos por colección (manual + smart)...")
 from collections import defaultdict
 prod_cols: dict[int, list[str]] = defaultdict(list)
-for c in collects:
-    col = cols_by_id.get(c["collection_id"])
-    if col:
-        prod_cols[c["product_id"]].append(col["handle"])
+total_rels = 0
+for col in all_cols:
+    col_products = paginate(
+        f"collections/{col['id']}/products.json", "products",
+        fields="id", limit=250,
+    )
+    for p in col_products:
+        prod_cols[p["id"]].append(col["handle"])
+        total_rels += 1
+    time.sleep(0.15)  # evitar rate limit
+print(f"   {total_rels} relaciones (manual + smart)")
 
 
 # ── Asignar upsell ─────────────────────────────────────────────────────────────
