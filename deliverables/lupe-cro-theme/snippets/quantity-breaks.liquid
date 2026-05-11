@@ -1,40 +1,28 @@
-{% doc %} Tabla descuentos por volumen (metafields custom.qty_breaks JSON o texto) {% enddoc %}
-{%- assign raw = product.metafields.custom.qty_breaks.value -%}
-{%- if raw == blank -%}{%- assign raw = product.metafields.custom.quantity_breaks.value -%}{%- endif -%}
-<div class="lupe-qtybreak lupe-card" style="margin:16px 0;padding:14px">
-  <p style="margin:0 0 8px;font-weight:800;font-size:14px">Ahorra comprando más</p>
-  {% assign code_3 = settings.cro_discount_3plus_code | strip %}
-  {% assign code_10 = settings.cro_discount_10plus_code | strip %}
+{% doc %} Tabla descuentos por volumen. Código LUPE3 = 10% off en 3+ unidades. {% enddoc %}
+<div class="lupe-qtybreak lupe-card" style="margin:16px 0;padding:14px;background:#1e293b;border-radius:10px;border:1px solid #334155">
+  <p style="margin:0 0 10px;font-weight:800;font-size:14px;color:#f8fafc">🏷️ Ahorra comprando más</p>
   <table style="width:100%;border-collapse:collapse;font-size:13px">
-    <thead><tr><th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155">Cantidad</th><th style="text-align:left;border-bottom:1px solid #334155">Precio / unidad</th></tr></thead>
-    <tbody>
-      <tr><td style="padding:6px 0">1</td><td>{{ product.selected_or_first_available_variant.price | money }}</td></tr>
+    <thead>
       <tr>
-        <td style="padding:6px 0">{{ settings.cro_discount_3plus_label | default: '3+ unidades' }}</td>
-        <td>
-          {% if code_3 != blank %}
-            <a href="/discount/{{ code_3 | url_encode }}?redirect=/cart" style="color:var(--lupe-accent,#22c55e);font-weight:700;text-decoration:none">Aplicar descuento {{ code_3 }}</a>
-          {% else %}
-            <span style="color:#cbd5e1">Configura el código en Theme settings para mostrar oferta real.</span>
-          {% endif %}
-        </td>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155;color:#94a3b8;font-weight:600">Cantidad</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155;color:#94a3b8;font-weight:600">Precio / unidad</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155;color:#94a3b8;font-weight:600">Descuento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:8px 0;color:#e2e8f0">1 unidad</td>
+        <td style="padding:8px 0;color:#e2e8f0">{{ product.selected_or_first_available_variant.price | money }}</td>
+        <td style="padding:8px 0;color:#94a3b8">Precio normal</td>
       </tr>
       <tr>
-        <td style="padding:6px 0">{{ settings.cro_discount_10plus_label | default: '10+ unidades' }}</td>
-        <td>
-          {% if code_10 != blank %}
-            <a href="/discount/{{ code_10 | url_encode }}?redirect=/cart" style="color:var(--lupe-accent,#22c55e);font-weight:700;text-decoration:none">Aplicar descuento {{ code_10 }}</a>
-          {% else %}
-            <span style="color:var(--lupe-accent,#22c55e);font-weight:700">Precio mayorista</span> <a href="{{ settings.cro_mayorista_url | default: '/pages/compra-por-mayor' }}" style="color:#38bdf8">Cotizar</a>
-          {% endif %}
+        <td style="padding:8px 0;color:#e2e8f0;font-weight:700">3+ unidades</td>
+        <td style="padding:8px 0;color:#86efac;font-weight:700">{{ product.selected_or_first_available_variant.price | times: 0.9 | money }}</td>
+        <td style="padding:8px 0">
+          <a href="/discount/LUPE3?redirect=/cart" style="display:inline-block;background:#16a34a;color:#fff;font-weight:700;font-size:12px;padding:4px 10px;border-radius:6px;text-decoration:none">-10% · Aplicar LUPE3</a>
         </td>
       </tr>
     </tbody>
   </table>
-  {%- if raw != blank -%}
-    <details style="margin-top:10px">
-      <summary style="cursor:pointer;font-size:12px;color:#94a3b8">Ver tabla específica del producto</summary>
-      <pre style="margin:8px 0 0;white-space:pre-wrap;font-size:12px;color:#cbd5e1">{{ raw }}</pre>
-    </details>
-  {%- endif -%}
+  <p style="margin:10px 0 0;font-size:11px;color:#64748b">Aplica el código LUPE3 en el carrito para obtener el 10% de descuento en compras de 3 o más unidades.</p>
 </div>
