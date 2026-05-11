@@ -41,15 +41,31 @@ RULES = [
       "aguja schmetz", "aguja singer", "aguja brother", "aguja janome",
       "aguja para máquina casera", "aguja para maquina casera",
       "aguja universal", "aguja bissel"],               "aguja-maquina-casera"),
+    # Agujas circular / tejido chunky → mano
+    (["aguja circular", "aguja de tejer"],              "agujas-mano"),
     # Repuestos máquinas
     (["bobina", "lanzadera", "canilla", "correa", "pedal", "motor",
       "guarda aguja", "guía de hilo", "guia de hilo", "devanadora",
-      "tensor", "prensatelas pie", "piñón", "pinon",
-      "ampolleta", "foco led", "aceitera", "brocha"],   "repuestos-maquinas-de-coser"),
+      "tensor", "tensión", "tension completa",
+      "prensatelas pie", "piñón", "pinon",
+      "ampolleta", "foco led", "aceitera", "brocha",
+      "tornillo", "resorte", "interruptor",
+      "carrete jumbo", "disco de friccion", "disco de fricción",
+      "goma de repuesto", "goma para devanador",
+      "cuchillo ojaladora", "cuchillo corta", "cuchillo inferior",
+      "cuchillo superior", "cuchillo para overlock", "cuchillo para siruba",
+      "cuchillo para yamato",
+      "repuesto para máquina", "repuesto para maquina",
+      "ref. ", " ref."],                               "repuestos-maquinas-de-coser"),
     # Accesorios máquina
     (["accesorio", "accesorios para máquina", "accesorios maquina",
       "guía magnética", "guia magnetica", "guía aérea", "guia aerea",
       "calibrador", "regla"],                           "repuestos-maquinas-de-coser"),
+    # Herramientas costura
+    (["herramienta manual", "herramienta para costura", "reach para"],
+                                                        "herramientas-de-costura"),
+    # Cierres
+    (["cierre", "cremallera", "diente de perro"],       "cierres-cremalleras"),
     # Cortadoras
     (["cortadora", "cuchilla cortadora", "repuesto cortadora"],
                                                         "cortadoras-de-tela-circulares"),
