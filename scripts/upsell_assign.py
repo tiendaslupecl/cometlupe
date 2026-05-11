@@ -17,6 +17,43 @@ sys.path.insert(0, str(_ROOT))
 from shopify_client import REST_BASE, HEADERS
 import requests
 
+# ── Prioridad: cuando un producto está en varias colecciones, se usa la primera
+# que aparezca en esta lista. Colecciones más específicas van primero.
+PRIORITY = [
+    # Hilos (específicos primero)
+    "hilos-bordar-profesionales",
+    "hilo-overlock",
+    "hilo-de-saco",
+    "hilo-poliamida",
+    "hilo-5000",
+    "hilo-2000",
+    # Agujas
+    "agujas-crochet-y-tejido",
+    "agujas-mano",
+    "aguja-maquina-industrial",
+    "aguja-maquina-casera",
+    # Prensatelas
+    "prensatelas-industriales-1",
+    "prensatelas-industriales",
+    "prensatelas-para-maquina-de-cos",
+    "prensatelas-caseros",
+    # Repuestos / Máquinas
+    "repuestos-de-cortadoras-de-telas",
+    "cortadoras-de-tela-circulares",
+    "repuestos-maquinas-de-coser",
+    "maquinas-y-repuestos",
+    "accesorios-maquina",
+    # Bordado
+    "bastidores-bordado",
+    # Tejido / Crochet / Lanas
+    "lanas-ovillos-crochet-tejido",
+    "crochet-accessories-ganchillos",
+    "trapillo-telas-crochet",
+    "tejido-y-manualidades",
+    "tejido-manualidades",
+    # Resto
+]
+
 # ── Cross-sell map: si el producto está en esta colección → mostrar esta otra ─
 # Lógica: complementos naturales de venta cruzada
 CROSS_SELL = {
@@ -146,8 +183,10 @@ for c in collects:
 # ── Asignar upsell ─────────────────────────────────────────────────────────────
 
 def best_upsell_handle(product_id: int) -> str | None:
-    handles = prod_cols.get(product_id, [])
-    for h in handles:
+    handles = set(prod_cols.get(product_id, []))
+    # Revisar primero en orden de PRIORITY, luego el resto
+    ordered = [h for h in PRIORITY if h in handles] + [h for h in handles if h not in PRIORITY]
+    for h in ordered:
         target = CROSS_SELL.get(h)
         if target and target in cols_by_handle:
             return target
