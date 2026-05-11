@@ -19,6 +19,8 @@ import requests as _requests  # noqa: E402
 SNIPPETS_DIR = _ROOT / "deliverables" / "lupe-cro-theme" / "snippets"
 
 EXTRA_SNIPPETS = ["icon-whatsapp.liquid"]
+EXTRA_ASSETS = ["cro-whatsapp-float.css"]
+ASSETS_DIR = _ROOT / "deliverables" / "lupe-cro-theme" / "assets"
 
 INJECT_MARKER = "data-lupe-wa-injected"
 INJECT_TEMPLATE = (
@@ -87,17 +89,27 @@ def main() -> None:
                 _put_asset(tid, key, fp.read_text(encoding="utf-8"))
             print(f"  ✅ {key} subido")
 
-    # 2. Leer layout/theme.liquid
+    # 2. Subir CSS del botón WhatsApp
+    for fname in EXTRA_ASSETS:
+        fp = ASSETS_DIR / fname
+        if not fp.exists():
+            continue
+        key = f"assets/{fname}"
+        if not args.dry_run:
+            _put_asset(tid, key, fp.read_text(encoding="utf-8"))
+        print(f"  ✅ {key} subido")
+
+    # 3. Leer layout/theme.liquid
     layout = _get_asset(tid, "layout/theme.liquid")
     if not layout:
         raise SystemExit("❌ No se encontró layout/theme.liquid en el tema")
 
-    # 3. Verificar si ya está inyectado
+    # 4. Verificar si ya está inyectado
     if INJECT_MARKER in layout:
         print("ℹ️  El botón WhatsApp ya estaba inyectado anteriormente.")
         return
 
-    # 4. Inyectar antes de </body>
+    # 5. Inyectar antes de </body>
     if "</body>" not in layout:
         raise SystemExit("❌ No se encontró </body> en layout/theme.liquid")
 
