@@ -1,16 +1,1 @@
-{%- liquid
-  assign dt_in_stock = section.settings.deliverytime_in_stock | default: settings.default_product_deliverytime_in_stock | default: '2-5 días hábiles'
-  assign dt_not_in_stock = section.settings.deliverytime_not_in_stock | default: settings.default_product_deliverytime_not_in_stock
--%}
-
-{%- if product.available -%}
-  <div class="lupe-deliverytime" style="display:flex;align-items:center;gap:6px;margin:10px 0;font-size:13px;color:#94a3b8">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <span>{{ 'product.form.in_stock' | t }}: {{ dt_in_stock }}</span>
-  </div>
-{%- else -%}
-  <div class="lupe-deliverytime lupe-deliverytime--oos" style="display:flex;align-items:center;gap:6px;margin:10px 0;font-size:13px;color:#fbbf24">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span>{{ 'product.form.not_in_stock' | t }}</span>
-  </div>
-{%- endif -%}
+{% comment %} Managed by Xtra theme — do not overwrite. {% endcomment %}
