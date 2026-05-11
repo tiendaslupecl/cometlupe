@@ -71,19 +71,40 @@ print()
 # Prioridad: primera regla que coincida gana.
 RULES = [
     # (lista de keywords, handle_colección_upsell)
-    (["aguja", "agujas"],                   "hilos"),
-    (["hilo", "hilos"],                     "agujas"),
-    (["tela", "telas"],                     "accesorios-costura"),
-    (["cremallera", "cierre", "zipper"],    "hilos"),
-    (["patron", "patrón", "patrones"],      "telas"),
-    (["bordado", "bordar"],                 "hilos"),
-    (["máquina", "maquina", "singer"],      "accesorios-maquinas-coser"),
-    (["accesorio", "accesorios", "prensatelas"], "agujas"),
-    (["botón", "boton", "botones"],         "hilos"),
-    (["encaje", "elástico", "elastico"],    "accesorios-costura"),
+    # Agujas → Hilos
+    (["aguja maquina", "aguja máquina", "schmetz", "organ", "universal"],   "hilo-2000"),
+    (["aguja mano", "aguja a mano"],                                         "hilo-2000"),
+    (["aguja crochet", "ganchillo"],                                         "lanas-ovillos-crochet-tejido"),
+    (["aguja", "agujas"],                                                    "hilo-2000"),
+    # Hilos → Agujas
+    (["hilo overlock", "overlock", "collareta"],                             "aguja-maquina-industrial"),
+    (["hilo bordar", "bordar", "bordado"],                                   "bastidores-bordado"),
+    (["hilo", "hilos"],                                                      "aguja-maquina-casera"),
+    # Prensatelas → Repuestos
+    (["prensatela", "prensatelas"],                                          "repuestos-maquinas-de-coser"),
+    # Tijeras / Cortadoras → Herramientas
+    (["tijera", "tijeras", "cortadora", "descosedor"],                       "herramientas-de-costura"),
+    # Cierres / Cremalleras → Herramientas
+    (["cierre", "cierres", "cremallera"],                                    "herramientas-de-costura"),
+    # Elásticos → Botones
+    (["elástico", "elastico", "elásticos"],                                  "botones"),
+    # Botones → Elásticos
+    (["botón", "boton", "botones"],                                          "elasticos-costura"),
+    # Broches / Hebillas → Herramientas
+    (["broche", "hebilla"],                                                  "herramientas-de-costura"),
+    # Lanas / Crochet → Agujas crochet
+    (["lana", "lanas", "ovillo", "tejido", "crochet", "trapillo"],           "agujas-crochet-y-tejido"),
+    # Entretelas / Adhesivos → Herramientas
+    (["entretela", "adhesivo", "termoadhesivo"],                             "herramientas-de-costura"),
+    # Tinturas → Herramientas
+    (["tintura", "anilina", "teñir"],                                        "herramientas-de-costura"),
+    # Máquinas / Repuestos → Accesorios
+    (["máquina", "maquina", "repuesto", "singer"],                           "accesorios-maquina"),
+    # Cintas / Sesgo → Herramientas
+    (["cinta", "sesgo", "bies", "pasamanería", "pasamaneria"],               "herramientas-de-costura"),
 ]
 
-DEFAULT_UPSELL = "accesorios-costura"  # colección fallback si ninguna regla aplica
+DEFAULT_UPSELL = "top-65-favoritos"  # colección fallback si ninguna regla aplica
 
 
 def best_upsell(product):
