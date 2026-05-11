@@ -56,6 +56,7 @@ RULES = [
       "cuchillo superior", "cuchillo para overlock", "cuchillo para siruba",
       "cuchillo para yamato",
       "repuesto para máquina", "repuesto para maquina",
+      "crochet para", "diente transportador", "filtro de aceite",
       "ref. ", " ref."],                               "repuestos-maquinas-de-coser"),
     # Accesorios máquina
     (["accesorio", "accesorios para máquina", "accesorios maquina",
