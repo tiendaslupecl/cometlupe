@@ -171,8 +171,8 @@ CROSS_SELL = {
     "cascabeles-costura-manualidades":  "bisuteria-y-decoracion",
     "argollas-manualidades":            "bisuteria-y-decoracion",
     "cuencas-madera":                   "bisuteria-y-decoracion",
-    "macrame-cordon-trenzado":          "cordones-zapatos-costura-manualidades",
-    "cordones-zapatos-costura-manualidades": "macrame-cordon-trenzado",
+    "macrame-cordon-trenzado":          "materiales-para-manualidades",
+    "cordones-zapatos-costura-manualidades": "materiales-para-manualidades",
     "tinturas":                         "herramientas-de-costura",
     "tinturas-y-pegamentos":            "tinturas",
     "tinturas-pegamentos":              "tinturas",
@@ -246,9 +246,26 @@ print(f"   {total_rels} relaciones (manual + smart)")
 
 # ── Asignar upsell ─────────────────────────────────────────────────────────────
 
-def best_upsell_handle(product_id: int) -> str | None:
+# Override por título: más específico que colección (ej: bordadora dentro de industrial)
+TITLE_OVERRIDES = [
+    # Agujas bordadora → hilos de bordar (no overlock)
+    (["bordadora", "bordado", "dbk"],       "hilos-bordar-profesionales"),
+    # Agujas Schmetz / Singer → caseras
+    (["schmetz", "singer"],                 "hilo-2000"),
+    # Agujas Groz-Beckert → industriales
+    (["groz", "beckert", "gb "],            "hilo-overlock"),
+    # Palillos tejido → lanas
+    (["palillo"],                           "lanas-ovillos-crochet-tejido"),
+]
+
+def best_upsell_handle(product_id: int, title: str = "") -> str | None:
+    t = title.lower()
+    # 1. Override por título (más específico)
+    for keywords, handle in TITLE_OVERRIDES:
+        if any(k in t for k in keywords) and handle in cols_by_handle:
+            return handle
+    # 2. Por colección con prioridad
     handles = set(prod_cols.get(product_id, [])) - EXCLUDE_FROM_MATCHING
-    # Revisar primero en orden de PRIORITY, luego el resto
     ordered = [h for h in PRIORITY if h in handles] + [h for h in handles if h not in PRIORITY]
     for h in ordered:
         target = CROSS_SELL.get(h)
@@ -261,24 +278,30 @@ def best_upsell_handle(product_id: int) -> str | None:
 
 # Sugerencia de colección para los sin asignar (por palabras en el título)
 TITLE_SUGGESTIONS = [
-    (["palillo", "palillos"],                       "agujas-crochet-y-tejido"),
+    (["palillo"],                                   "agujas-crochet-y-tejido"),
     (["aceitera", "aceite", "ampolleta", "foco"],   "repuestos-maquinas-de-coser"),
     (["bobina", "lanzadera", "canilla"],             "repuestos-maquinas-de-coser"),
-    (["pie", "prensatela"],                         "aguja-maquina-casera"),
-    (["tijera", "descosedor"],                      "herramientas-de-costura"),
-    (["cinta", "sesgo", "bies"],                    "cierres"),
-    (["elástico", "elastico"],                      "botones"),
-    (["botón", "boton"],                            "elasticos-costura"),
-    (["hilo", "hilos"],                             "aguja-maquina-casera"),
-    (["aguja mano", "aguja a mano"],                "hilos-bordar-profesionales"),
-    (["aguja", "agujas"],                           "hilo-2000"),
-    (["lana", "ovillo"],                            "agujas-crochet-y-tejido"),
-    (["bastidor"],                                  "hilos-bordar-profesionales"),
-    (["cierre", "cremallera"],                      "entretelas"),
-    (["entretela"],                                 "cierres"),
-    (["tintura", "anilina"],                        "herramientas-de-costura"),
-    (["broche", "hebilla"],                         "botones"),
-    (["repuesto", "accesorio"],                     "aguja-maquina-casera"),
+    (["bastidor"],                                   "bastidores-bordado"),
+    (["macramé", "macrame", "cordón trenzado", "cordon trenzado"], "macrame-cordon-trenzado"),
+    (["cordón", "cordon"],                           "cordones-zapatos-costura-manualidades"),
+    (["tijera", "descosedor"],                       "herramientas-de-costura"),
+    (["cinta", "sesgo", "bies"],                     "cierres"),
+    (["elástico", "elastico"],                       "elasticos-costura"),
+    (["botón", "boton"],                             "botones"),
+    (["hilo overlock", "overlock"],                  "hilo-overlock"),
+    (["hilo bordar", "bordar"],                      "hilos-bordar-profesionales"),
+    (["hilo"],                                       "hilo-2000"),
+    (["aguja mano", "aguja a mano"],                 "agujas-mano"),
+    (["schmetz", "singer"],                          "aguja-maquina-casera"),
+    (["groz", "beckert", "industrial"],              "aguja-maquina-industrial"),
+    (["aguja"],                                      "aguja-maquina-casera"),
+    (["lana", "ovillo"],                             "lanas-ovillos-crochet-tejido"),
+    (["cierre", "cremallera"],                       "cierres"),
+    (["entretela"],                                  "entretelas"),
+    (["tintura", "anilina"],                         "tinturas"),
+    (["broche"],                                     "broches"),
+    (["hebilla"],                                    "hebillas"),
+    (["repuesto", "accesorio maquina"],              "repuestos-maquinas-de-coser"),
 ]
 
 def suggest_by_title(title: str) -> str:
@@ -293,7 +316,7 @@ def suggest_by_title(title: str) -> str:
 plan = []
 unmatched = []
 for p in products:
-    target_handle = best_upsell_handle(p["id"])
+    target_handle = best_upsell_handle(p["id"], p.get("title", ""))
     if target_handle:
         plan.append((p, cols_by_handle[target_handle]))
     else:
