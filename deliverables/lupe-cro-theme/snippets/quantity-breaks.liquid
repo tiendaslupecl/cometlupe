@@ -1,28 +1,28 @@
 {% doc %} Tabla descuentos por volumen. Código LUPE3 = 10% off en 3+ unidades. {% enddoc %}
-<div class="lupe-qtybreak lupe-card" style="margin:16px 0;padding:14px;background:#1e293b;border-radius:10px;border:1px solid #334155">
-  <p style="margin:0 0 10px;font-weight:800;font-size:14px;color:#f8fafc">🏷️ Ahorra comprando más</p>
+<div class="lupe-qtybreak lupe-card" style="margin:16px 0;padding:14px;background:#f8f9fa;border-radius:10px;border:1px solid #e2e8f0">
+  <p style="margin:0 0 10px;font-weight:800;font-size:14px;color:#1a202c">🏷️ Ahorra comprando más</p>
   <table style="width:100%;border-collapse:collapse;font-size:13px">
     <thead>
       <tr>
-        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155;color:#94a3b8;font-weight:600">Cantidad</th>
-        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155;color:#94a3b8;font-weight:600">Precio / unidad</th>
-        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #334155;color:#94a3b8;font-weight:600">Descuento</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #e2e8f0;color:#718096;font-weight:600">Cantidad</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #e2e8f0;color:#718096;font-weight:600">Precio / unidad</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid #e2e8f0;color:#718096;font-weight:600">Descuento</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td style="padding:8px 0;color:#e2e8f0">1 unidad</td>
-        <td style="padding:8px 0;color:#e2e8f0">{{ product.selected_or_first_available_variant.price | money }}</td>
-        <td style="padding:8px 0;color:#94a3b8">Precio normal</td>
+        <td style="padding:8px 0;color:#4a5568">1 unidad</td>
+        <td style="padding:8px 0;color:#4a5568">{{ product.selected_or_first_available_variant.price | money }}</td>
+        <td style="padding:8px 0;color:#718096">Precio normal</td>
       </tr>
       <tr>
-        <td style="padding:8px 0;color:#e2e8f0;font-weight:700">3+ unidades</td>
-        <td style="padding:8px 0;color:#86efac;font-weight:700">{{ product.selected_or_first_available_variant.price | times: 0.9 | money }}</td>
+        <td style="padding:8px 0;color:#1a202c;font-weight:700">3+ unidades</td>
+        <td style="padding:8px 0;color:#16a34a;font-weight:700">{{ product.selected_or_first_available_variant.price | times: 0.9 | money }}</td>
         <td style="padding:8px 0">
           <a href="/discount/LUPE3?redirect=/cart" style="display:inline-block;background:#16a34a;color:#fff;font-weight:700;font-size:12px;padding:4px 10px;border-radius:6px;text-decoration:none">-10% · Aplicar LUPE3</a>
         </td>
       </tr>
     </tbody>
   </table>
-  <p style="margin:10px 0 0;font-size:11px;color:#64748b">Aplica el código LUPE3 en el carrito para obtener el 10% de descuento en compras de 3 o más unidades.</p>
+  <p style="margin:10px 0 0;font-size:11px;color:#718096">Aplica el código LUPE3 en el carrito para obtener el 10% de descuento en compras de 3 o más unidades.</p>
 </div>
