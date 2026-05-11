@@ -1,5 +1,5 @@
 {% doc %}
-  Botón flotante WhatsApp — ícono directo sin panel.
+  Botón flotante WhatsApp. Aparece tras 4 s; panel se cierra solo tras 6 s sin interacción.
   Parámetros: phone (E.164 sin +), brand (nombre tienda)
 {% enddoc %}
 {%- liquid
@@ -10,8 +10,51 @@
 -%}
 <link rel="stylesheet" href="{{ 'cro-whatsapp-float.css' | asset_url }}" media="print" onload="this.media='all'">
 <noscript>{{ 'cro-whatsapp-float.css' | asset_url | stylesheet_tag }}</noscript>
+<style>
+  .wa-float[data-wa-root]{opacity:0;pointer-events:none;transition:opacity .4s ease}
+  .wa-float[data-wa-root].wa-float--visible{opacity:1;pointer-events:auto}
+</style>
 <div class="wa-float" data-wa-root>
-  <a class="wa-float__toggle" href="{{ wa_url }}" target="_blank" rel="noopener" aria-label="WhatsApp {{ brand_name }}">
+  <button type="button" class="wa-float__toggle" aria-expanded="false" aria-controls="wa-float-panel" id="wa-float-btn" data-wa-toggle>
     <span class="wa-float__icon" aria-hidden="true">{% render 'icon-whatsapp' %}</span>
-  </a>
+    <span class="visually-hidden">WhatsApp {{ brand_name }}</span>
+  </button>
+  <div class="wa-float__panel" id="wa-float-panel" hidden data-wa-panel>
+    <p class="wa-float__title">¿Cómo te ayudamos?</p>
+    <a class="wa-float__link" data-wa-segment="principiante" href="{{ wa_url }}?text={{ 'Soy principiante y necesito orientación para comprar en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Principiante</a>
+    <a class="wa-float__link" data-wa-segment="emprendedor" href="{{ wa_url }}?text={{ 'Emprendo en costura y quiero escalar compras en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Emprendedor</a>
+    <a class="wa-float__link" data-wa-segment="taller_b2b" href="{{ wa_url }}?text={{ 'Tengo taller B2B: cotización y stock en ' | append: brand_name | url_encode }}" target="_blank" rel="noopener">Taller (B2B)</a>
+  </div>
 </div>
+<script>
+(function(){
+  var root=document.querySelector('[data-wa-root]');
+  var b=document.querySelector('[data-wa-toggle]');
+  var p=document.querySelector('[data-wa-panel]');
+  if(!root||!b||!p)return;
+  var autoCloseTimer=null;
+  function closePanel(){
+    b.setAttribute('aria-expanded','false');
+    p.hidden=true;
+    clearTimeout(autoCloseTimer);
+  }
+  function startAutoClose(){
+    clearTimeout(autoCloseTimer);
+    autoCloseTimer=setTimeout(closePanel,6000);
+  }
+  // Mostrar botón tras 4 segundos
+  setTimeout(function(){root.classList.add('wa-float--visible');},4000);
+  b.addEventListener('click',function(){
+    var open=b.getAttribute('aria-expanded')==='true';
+    if(open){closePanel();}
+    else{
+      b.setAttribute('aria-expanded','true');
+      p.hidden=false;
+      startAutoClose();
+    }
+  });
+  p.addEventListener('mouseenter',function(){clearTimeout(autoCloseTimer);});
+  p.addEventListener('mouseleave',startAutoClose);
+  p.addEventListener('touchstart',function(){clearTimeout(autoCloseTimer);},{passive:true});
+})();
+</script>
