@@ -17,20 +17,13 @@ from shopify_client import REST_BASE, HEADERS
 import requests
 
 # Reglas por título → colección destino (primera que coincida gana)
+# IMPORTANTE: agujas van ANTES que prensatelas — títulos como
+# "Aguja Singer + Prensatela" deben ir a agujas, no a prensatelas.
 RULES = [
-    # Prensatelas
-    (["prensatela industrial", "prensatelas industrial",
-      "recta industrial", "overlock industrial", "collareta industrial",
-      "flatlock", "presser foot industrial"],           "prensatelas-para-maquina-de-cos"),
-    (["prensatela casera", "prensatela doméstica", "prensatela domestica",
-      "prensatela para máquina casera", "prensatela para maquina casera",
-      "prensatela singer", "prensatela brother", "prensatela janome"],
-                                                        "prensatelas-para-maquina-de-cos"),
-    (["prensatela"],                                    "prensatelas-para-maquina-de-cos"),
-    # Agujas a mano
+    # Agujas a mano (primero)
     (["aguja de mano", "aguja a mano", "aguja tapiceria",
-      "aguja tapicería", "aguja lana", "aguja bordado a mano"],
-                                                        "agujas-mano"),
+      "aguja tapicería", "aguja lana", "aguja bordado a mano",
+      "aguja circular", "aguja de tejer"],               "agujas-mano"),
     # Agujas máquina industrial
     (["aguja industrial", "aguja para máquina industrial",
       "aguja overlock", "aguja collareta", "aguja recta industrial",
@@ -41,8 +34,15 @@ RULES = [
       "aguja schmetz", "aguja singer", "aguja brother", "aguja janome",
       "aguja para máquina casera", "aguja para maquina casera",
       "aguja universal", "aguja bissel"],               "aguja-maquina-casera"),
-    # Agujas circular / tejido chunky → mano
-    (["aguja circular", "aguja de tejer"],              "agujas-mano"),
+    # Prensatelas (después de agujas)
+    (["prensatela industrial", "prensatelas industrial",
+      "recta industrial", "overlock industrial", "collareta industrial",
+      "flatlock", "presser foot industrial"],           "prensatelas-para-maquina-de-cos"),
+    (["prensatela casera", "prensatela doméstica", "prensatela domestica",
+      "prensatela para máquina casera", "prensatela para maquina casera",
+      "prensatela singer", "prensatela brother", "prensatela janome"],
+                                                        "prensatelas-para-maquina-de-cos"),
+    (["prensatela"],                                    "prensatelas-para-maquina-de-cos"),
     # Repuestos máquinas
     (["bobina", "lanzadera", "canilla", "correa", "pedal", "motor",
       "guarda aguja", "guía de hilo", "guia de hilo", "devanadora",
