@@ -259,6 +259,37 @@ def best_upsell_handle(product_id: int) -> str | None:
     return None
 
 
+# Sugerencia de colección para los sin asignar (por palabras en el título)
+TITLE_SUGGESTIONS = [
+    (["palillo", "palillos"],                       "agujas-crochet-y-tejido"),
+    (["aceitera", "aceite", "ampolleta", "foco"],   "repuestos-maquinas-de-coser"),
+    (["bobina", "lanzadera", "canilla"],             "repuestos-maquinas-de-coser"),
+    (["pie", "prensatela"],                         "aguja-maquina-casera"),
+    (["tijera", "descosedor"],                      "herramientas-de-costura"),
+    (["cinta", "sesgo", "bies"],                    "cierres"),
+    (["elástico", "elastico"],                      "botones"),
+    (["botón", "boton"],                            "elasticos-costura"),
+    (["hilo", "hilos"],                             "aguja-maquina-casera"),
+    (["aguja mano", "aguja a mano"],                "hilos-bordar-profesionales"),
+    (["aguja", "agujas"],                           "hilo-2000"),
+    (["lana", "ovillo"],                            "agujas-crochet-y-tejido"),
+    (["bastidor"],                                  "hilos-bordar-profesionales"),
+    (["cierre", "cremallera"],                      "entretelas"),
+    (["entretela"],                                 "cierres"),
+    (["tintura", "anilina"],                        "herramientas-de-costura"),
+    (["broche", "hebilla"],                         "botones"),
+    (["repuesto", "accesorio"],                     "aguja-maquina-casera"),
+]
+
+def suggest_by_title(title: str) -> str:
+    t = title.lower()
+    for keywords, handle in TITLE_SUGGESTIONS:
+        if any(k in t for k in keywords):
+            if handle in cols_by_handle:
+                return handle
+    return "— sin sugerencia —"
+
+
 plan = []
 unmatched = []
 for p in products:
@@ -280,9 +311,12 @@ if len(plan) > 40:
 print()
 
 if unmatched:
-    print(f"⚠️  Sin asignar ({len(unmatched)}):")
-    for p in unmatched[:10]:
-        print(f"   {p['title']}")
+    print(f"⚠️  Sin asignar ({len(unmatched)}) — agregar a la colección sugerida en Shopify Admin:")
+    print(f"   {'Producto':50s}  {'Colección sugerida'}")
+    print(f"   {'-'*50}  {'-'*35}")
+    for p in unmatched:
+        suggestion = suggest_by_title(p["title"])
+        print(f"   {p['title'][:50]:50s}  {suggestion}")
     print()
 
 # ── Aplicar ────────────────────────────────────────────────────────────────────
