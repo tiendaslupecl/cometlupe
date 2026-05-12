@@ -45,13 +45,13 @@ RULES = {
     },
     "prensatelas-para-maquina-de-cos": {
         "must": ["prensatela","pie ","zapatilla"],
-        "exclude": ["aguja schmetz","aguja singer","tornillo solo","hilo ","cierre ","cremallera ","elastico"],
+        "exclude": ["aguja schmetz","aguja singer","tornillo solo","hilo ","cremallera ","elastico"],
     },
     "repuestos-maquinas-de-coser": {
         "must": ["tornillo","resorte","tension","carrete","disco","diente","filtro","crochet para","lanzadera","canilla","correa","pedal","motor","guarda","devanadora","ampolleta","foco","aceitera","interruptor","cuchillo","goma de repuesto","repuesto","barra de aguja","porta aguja","soporte","guia","placa","rueda","engranaje","palanca","perilla","boton","regulador","balanza"],
         "exclude": ["aguja schmetz","aguja singer","aguja groz","aguja beckert","aguja bissel","aguja industrial","aguja casera","aguja de mano","prensatela","hilo poliester","hilo poliamida"],
     },
-    "cortadoras-de-tela-circulares": {"must": ["cortadora"], "exclude": ["repuesto","cuchilla cortadora","lija cortadora","filo cortadora"]},
+    "cortadoras-de-tela-circulares": {"must": ["cortadora","cutter"], "exclude": ["repuesto","cuchilla cortadora","lija cortadora","filo cortadora"]},
     "repuestos-de-cortadoras-de-telas": {"must": ["cortadora","cuchilla","lija","filo","tornillo","repuesto"], "exclude": []},
     "planchas-a-vapor-industrial": {"must": ["plancha"], "exclude": ["plancha de aguja","repuesto plancha"]},
     "hilo-2000": {"must": ["hilo","2000"], "exclude": ["5000","bordar","bordado","poliamida","nylon","overlock","collareta"]},
