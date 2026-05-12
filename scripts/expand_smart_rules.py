@@ -81,6 +81,10 @@ UPDATES = {
             {"column": "title", "relation": "contains", "condition": "Cinta de Lona Algodón"},
             {"column": "title", "relation": "contains", "condition": "Cinta Lona Algodon"},
             {"column": "title", "relation": "contains", "condition": "Cinta Lona Algodón"},
+            {"column": "title", "relation": "contains", "condition": "Cinta Espiga Algodon"},
+            {"column": "title", "relation": "contains", "condition": "Cinta Espiga Algodón"},
+            {"column": "title", "relation": "contains", "condition": "Cinta espiga algodon"},
+            {"column": "title", "relation": "contains", "condition": "Cinta espiga algodón"},
         ],
     },
     "materiales-para-manualidades": {
