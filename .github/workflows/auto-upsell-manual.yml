@@ -1,0 +1,25 @@
+name: Reasignar Upsells (manual)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: ''0 15 * * 0''
+jobs:
+  upsell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: ''3.11'' }
+      - run: pip install requests python-dotenv
+      - name: Run upsell assign
+        env:
+          SHOP_DOMAIN: ${{ secrets.SHOP_DOMAIN }}
+          ADMIN_API_TOKEN: ${{ secrets.ADMIN_API_TOKEN }}
+        run: |
+          python scripts/upsell_assign.py --apply | tee upsell.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: upsell-log
+          path: upsell.log
+          retention-days: 14
