@@ -20,17 +20,32 @@ import requests
 
 def is_casera(title):
     t = title.lower()
-    return any(k in t for k in ["schmetz", "singer"])
+    return any(k in t for k in ["schmetz", "singer", "bissel", "aguja casera",
+                                 "aguja domestica", "aguja doméstica"])
 
 def is_industrial(title):
     t = title.lower()
     keywords = ["groz", "beckert", "dbx", "dbk", "uy128", "dax",
-                "overlock", "collareta", "bordadora",
-                "talon delgado", "talón delgado",
-                "talon grueso", "talón grueso",
+                "aguja overlock", "aguja collareta", "aguja bordadora",
+                "aguja para bordadora", "aguja de bordadora",
+                "aguja talon delgado", "aguja talón delgado",
+                "aguja talon grueso", "aguja talón grueso",
                 "aguja industrial", "aguja recta industrial",
                 "aguja para maquina industrial", "aguja para máquina industrial"]
     return any(k in t for k in keywords)
+
+# Productos cuyo titulo contiene 'aguja' pero NO son agujas reales (son repuestos/accesorios)
+def is_false_aguja(title):
+    t = title.lower()
+    excludes = ["aguja tornillo", "tornillo de", "tornillo para",
+                "plancha de aguja", "plancha aguja",
+                "guarda aguja", "guarda-aguja",
+                "guia aguja", "guía aguja", "guia de aguja",
+                "barra de aguja", "barra aguja",
+                "soporte aguja", "soporte de aguja",
+                "porta aguja", "porta-aguja",
+                "placa aguja", "placa de aguja"]
+    return any(k in t for k in excludes)
 
 def paginate(path, key, **params):
     items, params["limit"] = [], params.get("limit", 250)
@@ -83,9 +98,19 @@ to_add_industrial = []
 to_remove_casera     = []
 to_remove_industrial = []
 
+false_agujas_to_repuestos = []
+
 for p in all_agujas:
     pid = p["id"]
     t = p["title"]
+
+    # Filtrar falsas agujas (tornillos, planchas, guias, etc.)
+    if is_false_aguja(t):
+        false_agujas_to_repuestos.append(p)
+        if pid in cas_ids: to_remove_casera.append(p)
+        if pid in ind_ids: to_remove_industrial.append(p)
+        continue
+
     cas = is_casera(t)
     ind = is_industrial(t)
 
@@ -111,7 +136,13 @@ print(f"  Agregar a casera:    {len(to_add_casera)}")
 print(f"  Agregar a industrial: {len(to_add_industrial)}")
 print(f"  Quitar de casera:    {len(to_remove_casera)}")
 print(f"  Quitar de industrial: {len(to_remove_industrial)}")
+print(f"  Mover a accesorios-maquina (falsas agujas): {len(false_agujas_to_repuestos)}")
 print()
+if false_agujas_to_repuestos[:10]:
+    print("Ejemplos de FALSAS agujas (tornillos/planchas/guias) -> accesorios-maquina:")
+    for p in false_agujas_to_repuestos[:10]:
+        print(f"  - {p['title'][:65]}")
+    print()
 
 # Tambien sacar productos NO agujas de las colecciones
 non_aguja_in_cas = [cas_ids[pid] for pid in cas_ids
@@ -151,6 +182,16 @@ args = parser.parse_args()
 if not args.apply:
     print("Modo dry-run. Corre con --apply para aplicar.")
     sys.exit(0)
+
+# Buscar coleccion accesorios-maquina (puede ser smart o custom)
+acc_col = custom_by_handle.get("accesorios-maquina")
+acc_is_smart = False
+if not acc_col:
+    r = requests.get(f"{REST_BASE}/smart_collections.json", headers=HEADERS,
+                     params={"limit":250, "fields":"id,handle"}, timeout=30)
+    smarts = {c["handle"]: c for c in r.json()["smart_collections"]}
+    acc_col = smarts.get("accesorios-maquina")
+    acc_is_smart = bool(acc_col)
 
 # Obtener collect IDs para poder eliminar
 print("Cargando collects (relacion producto-coleccion)...")
@@ -201,5 +242,18 @@ for p in to_remove_industrial:
     elif s is None: pass
     else: err += 1
     time.sleep(0.15)
+
+# Mover falsas agujas a accesorios-maquina
+if acc_col and not acc_is_smart and false_agujas_to_repuestos:
+    print(f"\nMoviendo falsas agujas a accesorios-maquina (id={acc_col['id']})...")
+    for p in false_agujas_to_repuestos:
+        s = add_to_col(p, acc_col["id"])
+        print(f"  + accesorios: {p['title'][:55]:55s} HTTP {s}")
+        if s in (200,201,422): ok += 1
+        else: err += 1
+        time.sleep(0.15)
+elif acc_is_smart:
+    print(f"\nNOTA: accesorios-maquina es SMART, no se puede asignar manual.")
+    print(f"     {len(false_agujas_to_repuestos)} productos quedan sin coleccion accesorios.")
 
 print(f"\nOK {ok} cambios / ERR {err} errores")
