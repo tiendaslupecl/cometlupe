@@ -111,6 +111,17 @@ for p in all_agujas:
         if pid in ind_ids: to_remove_industrial.append(p)
         continue
 
+    # Excluir agujas de mano / tejido (no son de maquina)
+    if any(k in t.lower() for k in ["aguja de mano", "aguja a mano",
+                                     "aguja circular", "aguja de tejer",
+                                     "aguja tapiceria", "aguja tapicería",
+                                     "aguja lana", "aguja bordado a mano",
+                                     "aguja para tejer"]):
+        # Si esta en casera o industrial por error, sacarlo
+        if pid in cas_ids: to_remove_casera.append(p)
+        if pid in ind_ids: to_remove_industrial.append(p)
+        continue
+
     cas = is_casera(t)
     ind = is_industrial(t)
 
