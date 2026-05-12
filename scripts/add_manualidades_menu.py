@@ -113,13 +113,13 @@ for it in main["items"]:
     if not manualidades_inserted and it["title"].lower() in ("contacto", "contact"):
         new_items.append({
             "title": "Manualidades",
-            "type": "FRONTPAGE",  # placeholder; usamos URL
-            "url": "/collections/tejido-y-manualidades",
+            "type": "HTTP",
+            "url": "https://www.tiendaslupe.cl/collections/tejido-y-manualidades",
             "items": [
                 {
                     "title": title,
-                    "type": "COLLECTION",
-                    "url": f"/collections/{handle}",
+                    "type": "HTTP",
+                    "url": f"https://www.tiendaslupe.cl/collections/{handle}",
                 } for title, handle in valid
             ],
         })
@@ -130,10 +130,11 @@ if not manualidades_inserted:
     # Agregar al final si no habia Contacto
     new_items.append({
         "title": "Manualidades",
-        "type": "FRONTPAGE",
-        "url": "/collections/tejido-y-manualidades",
+        "type": "HTTP",
+        "url": "https://www.tiendaslupe.cl/collections/tejido-y-manualidades",
         "items": [
-            {"title": title, "type": "COLLECTION", "url": f"/collections/{handle}"}
+            {"title": title, "type": "HTTP",
+             "url": f"https://www.tiendaslupe.cl/collections/{handle}"}
             for title, handle in valid
         ],
     })
