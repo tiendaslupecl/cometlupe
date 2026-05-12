@@ -46,11 +46,19 @@ print()
 
 def check(path):
     url = STORE + path
-    try:
-        r = requests.head(url, timeout=10, allow_redirects=True)
-        return path, r.status_code
-    except Exception as e:
-        return path, f"ERR {type(e).__name__}"
+    for attempt in range(3):
+        try:
+            r = requests.head(url, timeout=15, allow_redirects=True)
+            if r.status_code == 429:
+                time.sleep(2 ** attempt * 2)  # 2s, 4s, 8s
+                continue
+            return path, r.status_code
+        except Exception as e:
+            if attempt < 2:
+                time.sleep(2)
+                continue
+            return path, f"ERR {type(e).__name__}"
+    return path, 429  # rendido despues de retries
 
 urls = []
 urls += [(f"/products/{p['handle']}", p["title"]) for p in active_prods]
@@ -59,23 +67,22 @@ urls += [(f"/pages/{p['handle']}", p["title"]) for p in published_pages]
 urls.append(("/", "Home"))
 urls.append(("/collections/all", "All"))
 
-print(f"Verificando {len(urls)} URLs en vivo...")
+print(f"Verificando {len(urls)} URLs en vivo (modo secuencial, lento)...")
 print()
 
 issues = []
 ok = 0
-with ThreadPoolExecutor(max_workers=8) as ex:
-    futures = {ex.submit(check, path): (path, title) for path, title in urls}
-    for i, fut in enumerate(as_completed(futures)):
-        path, status = fut.result()
-        title = futures[fut][1]
-        if isinstance(status, int) and status < 400:
-            ok += 1
-        else:
-            issues.append((path, title, status))
-            print(f"  [{status}] {path}  ({title[:50]})")
-        if (i+1) % 50 == 0:
-            print(f"  ... {i+1}/{len(urls)} verificados")
+# Sequencial con pause pequena para no gatillar rate-limit
+for i, (path, title) in enumerate(urls):
+    p, status = check(path)
+    if isinstance(status, int) and status < 400:
+        ok += 1
+    else:
+        issues.append((path, title, status))
+        print(f"  [{status}] {path}  ({title[:50]})")
+    if (i+1) % 50 == 0:
+        print(f"  ... {i+1}/{len(urls)} verificados, {ok} OK")
+    time.sleep(0.3)
 
 print()
 print(f"{'='*60}")
