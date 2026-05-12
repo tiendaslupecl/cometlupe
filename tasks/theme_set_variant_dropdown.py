@@ -84,7 +84,7 @@ def _find_main_product_section(data: dict[str, Any]) -> tuple[str, dict[str, Any
     if not isinstance(sections, dict):
         return None
     for sid, sec in sections.items():
-        if isinstance(sec, dict) and sec.get("type") == "main-product":
+        if isinstance(sec, dict) and sec.get("type") in ("main-product", "main-product-cro"):
             return sid, sec
     return None
 

@@ -16,7 +16,18 @@
                   {% endif %}
                   <div>
                     <p style="margin:0 0 8px;font-weight:800">{{ block.settings.title }}</p>
-                    <div style="font-size:13px;color:#94a3b8;white-space:pre-line">{{ block.settings.links }}</div>
+                    <ul style="margin:0;padding:0;list-style:none;display:grid;gap:6px">
+                      {%- assign mega_links = block.settings.links | newline_to_br | split: '<br />' -%}
+                      {% for raw_line in mega_links %}
+                        {%- assign line = raw_line | strip -%}
+                        {% if line != blank %}
+                          {%- assign parts = line | split: '|' -%}
+                          {%- assign line_label = parts[0] | strip -%}
+                          {%- assign line_url = parts[1] | default: block.settings.url | strip -%}
+                          <li><a href="{{ line_url }}" style="font-size:13px;color:#94a3b8;text-decoration:none">{{ line_label }}</a></li>
+                        {% endif %}
+                      {% endfor %}
+                    </ul>
                     <a class="lupe-btn lupe-btn--primary" style="margin-top:10px;display:inline-block" href="{{ block.settings.url }}">{{ block.settings.cta }}</a>
                   </div>
                 </div>
@@ -25,7 +36,7 @@
         {% endcase %}
       {% endfor %}
     </nav>
-    <a href="{{ routes.cart_url }}" class="lupe-btn lupe-btn--secondary" style="padding:.5rem .9rem;font-size:14px">Carrito ({{ cart.item_count }})</a>
+    <a href="{{ routes.cart_url }}" class="lupe-btn lupe-btn--secondary" style="padding:.5rem .9rem;font-size:14px">Carrito (<span data-cart-count>{{ cart.item_count }}</span>)</a>
   </div>
 </header>
 <style>.lupe-mega:focus-within .lupe-mega__panel,.lupe-mega:hover .lupe-mega__panel{display:block!important}</style>
@@ -40,7 +51,7 @@
       "name": "Enlace",
       "settings": [
         { "type": "text", "id": "label", "label": "Texto", "default": "Ofertas" },
-        { "type": "url", "id": "url", "label": "URL", "default": "/collections/all" }
+        { "type": "url", "id": "url", "label": "URL" }
       ]
     },
     {
@@ -50,7 +61,7 @@
         { "type": "text", "id": "label", "label": "Etiqueta", "default": "Insumos" },
         { "type": "text", "id": "title", "label": "Título panel", "default": "Insumos de confección" },
         { "type": "textarea", "id": "links", "label": "Links (una por línea: Texto|URL)", "default": "Hilos|/collections/insumos-confeccion\nElásticos|/collections/insumos-confeccion" },
-        { "type": "url", "id": "url", "label": "URL CTA", "default": "/collections/insumos-confeccion" },
+        { "type": "url", "id": "url", "label": "URL CTA" },
         { "type": "text", "id": "cta", "label": "Texto CTA", "default": "Ver colección" },
         { "type": "image_picker", "id": "image", "label": "Imagen" }
       ]

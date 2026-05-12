@@ -3,5 +3,14 @@
     "accessibility": {
       "skip_to_content": "Skip to content"
     }
+  },
+  "product": {
+    "form": {
+      "in_stock": "In stock",
+      "not_in_stock": "Out of stock"
+    }
+  },
+  "social_share": {
+    "whatsapp": "Hi, I saw this product at Tiendas Lupe and want more info"
   }
 }

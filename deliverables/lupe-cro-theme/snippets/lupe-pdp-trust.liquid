@@ -1,0 +1,14 @@
+{%- liquid
+  assign wa = settings.cro_whatsapp_e164 | default: '56963855857'
+  assign wa_url = 'https://wa.me/' | append: wa
+-%}
+<div class="lupe-pdp-trust" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;font-size:12px;color:#94a3b8;align-items:center">
+  <span>✓ Envíos Chile</span>
+  <span>✓ Stock verificado</span>
+  <span>✓ Asesoría</span>
+  <span>✓ Mayorista</span>
+  <a href="{{ wa_url }}?text={{ 'social_share.whatsapp' | t | url_encode }}" target="_blank" rel="noopener" style="color:#4ade80;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px">
+    {%- render 'icon-whatsapp' -%}
+    WhatsApp
+  </a>
+</div>

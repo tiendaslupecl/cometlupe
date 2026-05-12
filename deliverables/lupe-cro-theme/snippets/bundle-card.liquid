@@ -8,7 +8,7 @@
   {%- assign save = compare | minus: price | times: 100 | divided_by: compare -%}
 {%- endif -%}
 <article class="lupe-card" style="height:100%;display:flex;flex-direction:column">
-  <a href="{{ p.url }}" style="text-decoration:none;color:inherit">
+  <a href="{{ p.url }}" style="text-decoration:none;color:inherit" data-track-select-item data-source="bundle_card" data-product-id="{{ p.id }}" data-product-title="{{ p.title | escape }}" data-product-price="{{ p.price }}">
     {%- if p.featured_image -%}
       <img src="{{ p.featured_image | image_url: width: 600 }}" alt="{{ p.featured_image.alt | default: p.title | escape }}" width="600" height="600" loading="lazy" style="width:100%;border-radius:10px;margin-bottom:12px;aspect-ratio:1;object-fit:cover">
     {%- endif -%}
@@ -22,6 +22,6 @@
       {%- endif -%}
     </div>
   </a>
-  <a class="lupe-btn lupe-btn--primary" style="margin-top:auto;width:100%;text-align:center" href="{{ p.url }}">Comprar bundle</a>
+  <a class="lupe-btn lupe-btn--primary" style="margin-top:auto;width:100%;text-align:center" href="{{ p.url }}" data-track-select-item data-source="bundle_card_cta" data-product-id="{{ p.id }}" data-product-title="{{ p.title | escape }}" data-product-price="{{ p.price }}">Comprar bundle</a>
 </article>
 {%- endif -%}

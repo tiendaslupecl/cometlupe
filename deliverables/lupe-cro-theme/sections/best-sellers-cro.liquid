@@ -3,7 +3,7 @@
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px">
     {% for product in section.settings.products %}
       <div class="lupe-card" style="padding:12px">
-        <a href="{{ product.url }}" style="text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center">
+        <a href="{{ product.url }}" style="text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center" data-track-select-item data-source="best_sellers" data-product-id="{{ product.id }}" data-product-title="{{ product.title | escape }}" data-product-price="{{ product.price }}">
           {%- if product.featured_image -%}
             <img src="{{ product.featured_image | image_url: width: 120 }}" alt="" width="60" height="60" loading="lazy" style="border-radius:8px;object-fit:cover">
           {%- endif -%}

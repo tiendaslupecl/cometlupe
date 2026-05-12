@@ -26,8 +26,49 @@
       {
         "type": "url",
         "id": "cro_mayorista_url",
-        "label": "Página mayorista",
-        "default": "/pages/compra-por-mayor"
+        "label": "Página mayorista"
+      },
+      {
+        "type": "header",
+        "content": "Tiempos de entrega"
+      },
+      {
+        "type": "text",
+        "id": "default_product_deliverytime_in_stock",
+        "label": "Plazo en stock",
+        "default": "2-5 días hábiles"
+      },
+      {
+        "type": "text",
+        "id": "default_product_deliverytime_not_in_stock",
+        "label": "Mensaje sin stock",
+        "default": "Sujeto a reposición — te confirmamos el plazo al procesar el pedido."
+      },
+      {
+        "type": "header",
+        "content": "Descuentos por volumen"
+      },
+      {
+        "type": "text",
+        "id": "cro_discount_3plus_label",
+        "label": "Etiqueta tramo 3+",
+        "default": "3+ unidades"
+      },
+      {
+        "type": "text",
+        "id": "cro_discount_3plus_code",
+        "label": "Código descuento tramo 3+ (opcional)"
+      },
+      {
+        "type": "text",
+        "id": "cro_discount_10plus_label",
+        "label": "Etiqueta tramo 10+",
+        "default": "10+ unidades"
+      },
+      {
+        "type": "text",
+        "id": "cro_discount_10plus_code",
+        "label": "Código descuento tramo 10+ (opcional)"
       },
       {
         "type": "header",
