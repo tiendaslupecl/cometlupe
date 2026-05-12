@@ -48,7 +48,7 @@ RULES = {
         "exclude": ["aguja schmetz","aguja singer","tornillo solo","hilo ","cremallera ","elastico"],
     },
     "repuestos-maquinas-de-coser": {
-        "must": ["tornillo","resorte","tension","carrete","disco","diente","filtro","crochet para","lanzadera","canilla","correa","pedal","motor","guarda","devanadora","ampolleta","foco","aceitera","interruptor","cuchillo","goma de repuesto","repuesto","barra de aguja","porta aguja","soporte","guia","placa","rueda","engranaje","palanca","perilla","boton","regulador","balanza"],
+        "must": ["tornillo","resorte","tension","tensor","tirahilo","lampara","carrete","disco","diente","filtro","crochet para","lanzadera","canilla","correa","pedal","motor","guarda","devanadora","ampolleta","foco","aceitera","interruptor","cuchillo","goma de repuesto","repuesto","barra de aguja","porta aguja","soporte","guia","placa","rueda","engranaje","palanca","perilla","boton","regulador","balanza"],
         "exclude": ["aguja schmetz","aguja singer","aguja groz","aguja beckert","aguja bissel","aguja industrial","aguja casera","aguja de mano","prensatela","hilo poliester","hilo poliamida"],
     },
     "cortadoras-de-tela-circulares": {"must": ["cortadora","cutter"], "exclude": ["repuesto","cuchilla cortadora","lija cortadora","filo cortadora"]},
