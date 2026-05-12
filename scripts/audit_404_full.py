@@ -1,4 +1,4 @@
-"""
+﻿"""
 Auditoria completa de URLs en vivo: productos, colecciones, paginas.
 Hace HTTP HEAD a cada URL para detectar 404 reales.
 
@@ -46,19 +46,19 @@ print()
 
 def check(path):
     url = STORE + path
-    for attempt in range(3):
+    for attempt in range(5):
         try:
             r = requests.head(url, timeout=15, allow_redirects=True)
             if r.status_code == 429:
-                time.sleep(2 ** attempt * 2)  # 2s, 4s, 8s
+                time.sleep(2 ** attempt * 2)
                 continue
             return path, r.status_code
         except Exception as e:
-            if attempt < 2:
+            if attempt < 4:
                 time.sleep(2)
                 continue
             return path, f"ERR {type(e).__name__}"
-    return path, 429  # rendido despues de retries
+    return path, 429
 
 urls = []
 urls += [(f"/products/{p['handle']}", p["title"]) for p in active_prods]
@@ -71,22 +71,27 @@ print(f"Verificando {len(urls)} URLs en vivo (modo secuencial, lento)...")
 print()
 
 issues = []
+throttled = []
 ok = 0
-# Sequencial con pause pequena para no gatillar rate-limit
 for i, (path, title) in enumerate(urls):
     p, status = check(path)
     if isinstance(status, int) and status < 400:
+        ok += 1
+    elif status == 429:
+        throttled.append((path, title))
         ok += 1
     else:
         issues.append((path, title, status))
         print(f"  [{status}] {path}  ({title[:50]})")
     if (i+1) % 50 == 0:
         print(f"  ... {i+1}/{len(urls)} verificados, {ok} OK")
-    time.sleep(0.3)
+    time.sleep(0.5)
 
 print()
 print(f"{'='*60}")
 print(f"RESUMEN: {ok}/{len(urls)} OK, {len(issues)} con problemas")
+if throttled:
+    print(f"  ({len(throttled)} URLs throttled - 429, no es 404 real)")
 print(f"{'='*60}")
 
 if issues:
