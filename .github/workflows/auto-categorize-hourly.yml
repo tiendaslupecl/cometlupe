@@ -1,7 +1,7 @@
 name: Auto-categorizar productos nuevos
 on:
   schedule:
-    - cron: ''5 * * * *''
+    - cron: '5 * * * *'
   workflow_dispatch:
 jobs:
   categorize:
@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: ''3.11'' }
+        with: { python-version: '3.11' }
       - run: pip install requests python-dotenv
       - name: Auto-categorize
         env:
@@ -23,3 +23,4 @@ jobs:
           name: auto-categorize-log
           path: auto-categorize.log
           retention-days: 14
+
