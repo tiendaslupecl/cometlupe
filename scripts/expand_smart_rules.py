@@ -70,6 +70,28 @@ UPDATES = {
             {"column": "title", "relation": "contains", "condition": "Anilina"},
         ],
     },
+    "cintas-algodon": {
+        "disjunctive": True,
+        "rules": [
+            {"column": "title", "relation": "contains", "condition": "Cinta Algodon"},
+            {"column": "title", "relation": "contains", "condition": "Cinta Algodón"},
+            {"column": "title", "relation": "contains", "condition": "Cinta de Algodon"},
+            {"column": "title", "relation": "contains", "condition": "Cinta de Algodón"},
+            {"column": "title", "relation": "contains", "condition": "Cinta de Lona Algodon"},
+            {"column": "title", "relation": "contains", "condition": "Cinta de Lona Algodón"},
+            {"column": "title", "relation": "contains", "condition": "Cinta Lona Algodon"},
+            {"column": "title", "relation": "contains", "condition": "Cinta Lona Algodón"},
+        ],
+    },
+    "materiales-para-manualidades": {
+        "disjunctive": True,
+        "rules": [
+            {"column": "title", "relation": "contains", "condition": "Hilo de Pesca"},
+            {"column": "title", "relation": "contains", "condition": "Materiales para Manualidades"},
+            {"column": "tag",   "relation": "equals",   "condition": "cat-materiales-manualidades"},
+            {"column": "tag",   "relation": "equals",   "condition": "materiales-manualidades"},
+        ],
+    },
     # herramientas-de-costura: ya tiene 7 reglas, agregamos mas titulos
     "herramientas-de-costura": {
         "disjunctive": True,
