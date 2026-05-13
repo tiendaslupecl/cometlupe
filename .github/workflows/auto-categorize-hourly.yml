@@ -1,7 +1,7 @@
-name: Auto-categorizar productos nuevos
+﻿name: Auto-categorizar productos nuevos
 on:
   schedule:
-    - cron: '5 * * * *'
+    - cron: '5 11,14,17,20,23,2 * * *'
   workflow_dispatch:
 jobs:
   categorize:
@@ -9,18 +9,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - run: pip install requests python-dotenv
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
       - name: Auto-categorize
+        id: categorize
         env:
           SHOP_DOMAIN: ${{ secrets.SHOP_DOMAIN }}
           ADMIN_API_TOKEN: ${{ secrets.ADMIN_API_TOKEN }}
         run: |
-          python scripts/auto_categorize.py --since-hours 2 --apply | tee auto-categorize.log
+          python scripts/auto_categorize.py --since-hours 4 --apply | tee auto-categorize.log
+          grep -qE "^[1-9][0-9]* acciones aplicadas" auto-categorize.log && echo "changed=true" >> $GITHUB_OUTPUT || echo "changed=false" >> $GITHUB_OUTPUT
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: steps.categorize.outputs.changed == 'true'
         with:
-          name: auto-categorize-log
+          name: auto-categorize-${{ github.run_id }}
           path: auto-categorize.log
           retention-days: 14
-
