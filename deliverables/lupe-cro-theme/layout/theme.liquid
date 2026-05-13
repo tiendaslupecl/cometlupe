@@ -39,6 +39,7 @@
           node.textContent=String(count);
         });
       }
+      window.lupeUpdateCartCount=updateCartCount;
       document.addEventListener('click',function(ev){
         var checkoutLink=ev.target.closest('a[href*="/checkout"]');
         if(checkoutLink){
