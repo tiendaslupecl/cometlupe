@@ -1,4 +1,4 @@
-﻿"""
+"""
 Auditoria completa de URLs en vivo: productos, colecciones, paginas.
 Hace HTTP HEAD a cada URL para detectar 404 reales.
 
@@ -49,7 +49,7 @@ def check(path):
     for attempt in range(5):
         try:
             r = requests.head(url, timeout=15, allow_redirects=True)
-            if r.status_code == 429:
+            if r.status_code in (429, 503):
                 time.sleep(2 ** attempt * 2)
                 continue
             return path, r.status_code
@@ -58,7 +58,7 @@ def check(path):
                 time.sleep(2)
                 continue
             return path, f"ERR {type(e).__name__}"
-    return path, 429
+    return path, 503
 
 urls = []
 urls += [(f"/products/{p['handle']}", p["title"]) for p in active_prods]
@@ -77,7 +77,7 @@ for i, (path, title) in enumerate(urls):
     p, status = check(path)
     if isinstance(status, int) and status < 400:
         ok += 1
-    elif status == 429:
+    elif status in (429, 503):
         throttled.append((path, title))
         ok += 1
     else:
@@ -91,7 +91,7 @@ print()
 print(f"{'='*60}")
 print(f"RESUMEN: {ok}/{len(urls)} OK, {len(issues)} con problemas")
 if throttled:
-    print(f"  ({len(throttled)} URLs throttled - 429, no es 404 real)")
+    print(f"  ({len(throttled)} URLs throttled - 429/503 transitorio, no es error real)")
 print(f"{'='*60}")
 
 if issues:

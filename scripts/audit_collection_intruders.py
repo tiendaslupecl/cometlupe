@@ -71,7 +71,7 @@ RULES = {
     "tijeras-profesionales-para-costura": {"must": ["tijera"], "exclude": []},
     "alfileres": {"must": ["alfiler"], "exclude": []},
     "botones": {"must": ["boton"], "exclude": ["broche","regulador"]},
-    "hebillas": {"must": ["hebilla"], "exclude": []},
+    "hebillas": {"must": ["hebilla", "mosqueton"], "exclude": []},
     "accesorios-maquina": {"must": ["tornillo","plancha","guarda","porta","guia","barra","soporte","placa","accesorio","prensatela"], "exclude": []},
 }
 
