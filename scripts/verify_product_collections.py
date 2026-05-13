@@ -23,7 +23,7 @@ TITLE_RULES = [
     # Hilos
     (["hilo poliester 2000", "hilo 2000", "2000 yardas", "2000 yrds"],  "hilo-2000"),
     (["hilo poliester 5000", "hilo 5000", "5000 yardas"],               "hilo-5000"),
-    (["hilo poliamida", "nylon"],                                       "hilo-poliamida"),
+    (["hilo poliamida", "hilo nylon"],                                       "hilo-poliamida"),
     (["hilo overlock", "hilo collareta"],                               "hilo-overlock"),
     (["hilo bordar", "hilo bordado"],                                   "hilos-bordar-profesionales"),
     (["hilo de saco", "hilo saco"],                                     "hilo-de-saco"),
@@ -46,12 +46,12 @@ TITLE_RULES = [
       "devanadora", "ampolleta", "foco led", "aceitera",
       "interruptor", "cuchillo ojaladora", "cuchillo inferior",
       "cuchillo superior", "goma de repuesto"],                         "repuestos-maquinas-de-coser"),
+    (["repuesto cortadora", "repuesto para cortadora", "engranaje repuesto", "lija de repuesto", "cuchillo circular repuesto"], "repuestos-de-cortadoras-de-telas"),
     (["cortadora", "cuchilla cortadora"],                               "cortadoras-de-tela-circulares"),
-    (["repuesto cortadora", "repuesto para cortadora"],                 "repuestos-de-cortadoras-de-telas"),
     (["plancha industrial", "plancha vapor", "plancha a vapor"],        "planchas-a-vapor-industrial"),
     # Insumos
     (["elastico", "elástico"],                                          "elasticos-costura"),
-    (["cierre", "cremallera"],                                          "cierres-y-cremalleras-para-costura"),
+    (["cierre", "cremallera"],                                          "cierres"),
     (["broche"],                                                        "broches"),
     (["velcro"],                                                        "velcro"),
     (["cinta satin", "cinta satín"],                                    "cintas-satin"),
