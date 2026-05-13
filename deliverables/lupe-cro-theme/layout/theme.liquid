@@ -35,9 +35,20 @@
       }
       function updateCartCount(count){
         if(count===null||count===undefined)return;
-        document.querySelectorAll('[data-cart-count]').forEach(function(node){
+        var cartCountNodes=document.querySelectorAll('[data-cart-count]');
+        cartCountNodes.forEach(function(node){
           node.textContent=String(count);
         });
+        // Fallback for headers from base themes that do not expose data-cart-count.
+        if(!cartCountNodes.length){
+          document.querySelectorAll('a,button').forEach(function(node){
+            var text=(node.textContent||'').trim();
+            if(!text)return;
+            if(/carrito\\s*\\(\\s*\\d+\\s*\\)/i.test(text)){
+              node.textContent=text.replace(/(carrito\\s*\\()\\s*\\d+\\s*(\\))/i,'$1'+String(count)+'$2');
+            }
+          });
+        }
       }
       window.lupeUpdateCartCount=updateCartCount;
       document.addEventListener('click',function(ev){
