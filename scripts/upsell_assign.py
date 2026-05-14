@@ -1,6 +1,6 @@
-"""
-Asigna custom.upsell_collection a cada producto basándose en las colecciones
-a las que ya pertenece (no en palabras del título).
+﻿"""
+Asigna custom.upsell_collection a cada producto basÃ¡ndose en las colecciones
+a las que ya pertenece (no en palabras del tÃ­tulo).
 
 Uso:
     python scripts/upsell_assign.py --dry-run    # muestra el plan sin tocar nada
@@ -17,32 +17,32 @@ sys.path.insert(0, str(_ROOT))
 from shopify_client import REST_BASE, HEADERS
 import requests
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# GRUPOS DE TÉCNICA — cross-sell solo dentro del mismo grupo
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# GRUPOS DE TÃ‰CNICA â€” cross-sell solo dentro del mismo grupo
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# ── Grupo 1: Costura Máquina Casera ──────────────────────────────────────────
-# aguja casera ↔ hilos caseros ↔ prensatelas caseros ↔ repuestos
+# â”€â”€ Grupo 1: Costura MÃ¡quina Casera â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# aguja casera â†” hilos caseros â†” prensatelas caseros â†” repuestos
 
-# ── Grupo 2: Costura Máquina Industrial ──────────────────────────────────────
-# aguja industrial ↔ hilo overlock ↔ prensatelas industriales
+# â”€â”€ Grupo 2: Costura MÃ¡quina Industrial â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# aguja industrial â†” hilo overlock â†” prensatelas industriales
 
-# ── Grupo 3: Bordado ──────────────────────────────────────────────────────────
-# hilos bordar ↔ bastidores ↔ agujas mano
+# â”€â”€ Grupo 3: Bordado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# hilos bordar â†” bastidores â†” agujas mano
 
-# ── Grupo 4: Tejido / Crochet ─────────────────────────────────────────────────
-# lanas ↔ agujas crochet/palillos ↔ trapillo
+# â”€â”€ Grupo 4: Tejido / Crochet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# lanas â†” agujas crochet/palillos â†” trapillo
 
-# ── Grupo 5: Insumos Confección ───────────────────────────────────────────────
-# cierres ↔ entretelas ↔ elasticos ↔ botones ↔ sesgo ↔ broches
+# â”€â”€ Grupo 5: Insumos ConfecciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# cierres â†” entretelas â†” elasticos â†” botones â†” sesgo â†” broches
 
-# ── Grupo 6: Herramientas de Corte ────────────────────────────────────────────
-# tijeras ↔ herramientas ↔ cortadoras ↔ repuestos cortadoras
+# â”€â”€ Grupo 6: Herramientas de Corte â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# tijeras â†” herramientas â†” cortadoras â†” repuestos cortadoras
 
-# ── Grupo 7: Decoración / Manualidades ───────────────────────────────────────
-# bisutería ↔ lentejuelas ↔ pasamanería ↔ cordones ↔ tinturas
+# â”€â”€ Grupo 7: DecoraciÃ³n / Manualidades â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# bisuterÃ­a â†” lentejuelas â†” pasamanerÃ­a â†” cordones â†” tinturas
 
-# Prioridad: colección más específica gana cuando un producto pertenece a varias
+# Prioridad: colecciÃ³n mÃ¡s especÃ­fica gana cuando un producto pertenece a varias
 PRIORITY = [
     # G1 - Casera (hilos primero para que un hilo no sea confundido con aguja)
     "hilo-5000",
@@ -66,7 +66,7 @@ PRIORITY = [
     "agujas-crochet-y-tejido",
     "crochet-accessories-ganchillos",
     "trapillo-telas-crochet",
-    # G5 - Insumos confección
+    # G5 - Insumos confecciÃ³n
     "cierres",
     "entretelas",
     "elasticos-costura",
@@ -87,7 +87,7 @@ PRIORITY = [
     "herramientas-de-costura",
     "herramientas-costura",
     "herramientas",
-    # G7 - Decoración / Manualidades
+    # G7 - DecoraciÃ³n / Manualidades
     "bisuteria-y-decoracion",
     "bisuteria-decoracion",
     "lentejuelas-y-strass",
@@ -101,7 +101,7 @@ PRIORITY = [
     "tinturas",
     "tinturas-y-pegamentos",
     "tinturas-pegamentos",
-    # Máquinas / repuestos / planchas
+    # MÃ¡quinas / repuestos / planchas
     "maquinas-y-repuestos",
     "accesorios-maquina",
     "repuestos-maquinas-de-coser",
@@ -109,7 +109,7 @@ PRIORITY = [
 ]
 
 CROSS_SELL = {
-    # ── G1: Costura Máquina Casera ──────────────────────────────────────────
+    # â”€â”€ G1: Costura MÃ¡quina Casera â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "hilo-2000":                        "aguja-maquina-casera",
     "hilo-5000":                        "aguja-maquina-casera",
     "aguja-maquina-casera":             "hilo-2000",
@@ -119,26 +119,26 @@ CROSS_SELL = {
     "accesorios-maquina":               "aguja-maquina-casera",
     "maquinas-y-repuestos":             "repuestos-maquinas-de-coser",
 
-    # ── G2: Costura Máquina Industrial ──────────────────────────────────────
+    # â”€â”€ G2: Costura MÃ¡quina Industrial â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "hilo-overlock":                    "aguja-maquina-industrial",
     "hilo-poliamida":                   "aguja-maquina-industrial",
     "hilo-de-saco":                     "aguja-maquina-industrial",
-    "aguja-maquina-industrial":         "hilo-overlock",
+    "aguja-maquina-industrial":         "hilo-jeans",
     "prensatelas-industriales":         "aguja-maquina-industrial",
     "prensatelas-industriales-1":       "hilo-overlock",
 
-    # ── G3: Bordado ──────────────────────────────────────────────────────────
+    # â”€â”€ G3: Bordado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "hilos-bordar-profesionales":       "bastidores-bordado",
     "bastidores-bordado":               "hilos-bordar-profesionales",
     "agujas-mano":                      "hilos-bordar-profesionales",
 
-    # ── G4: Tejido / Crochet ─────────────────────────────────────────────────
+    # â”€â”€ G4: Tejido / Crochet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "lanas-ovillos-crochet-tejido":     "agujas-crochet-y-tejido",
     "agujas-crochet-y-tejido":          "lanas-ovillos-crochet-tejido",
     "crochet-accessories-ganchillos":   "lanas-ovillos-crochet-tejido",
     "trapillo-telas-crochet":           "agujas-crochet-y-tejido",
 
-    # ── G5: Insumos Confección ───────────────────────────────────────────────
+    # â”€â”€ G5: Insumos ConfecciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "cierres":                          "entretelas",
     "entretelas":                       "cierres",
     "adhesivos-telas":                  "entretelas",
@@ -153,7 +153,7 @@ CROSS_SELL = {
     "huincha-mochila":                  "elasticos-costura",
     "alfileres":                        "herramientas-de-costura",
 
-    # ── G6: Herramientas de Corte ────────────────────────────────────────────
+    # â”€â”€ G6: Herramientas de Corte â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "cortadoras-de-tela-circulares":    "repuestos-de-cortadoras-de-telas",
     "repuestos-de-cortadoras-de-telas": "cortadoras-de-tela-circulares",
     "tijeras-profesionales-para-costura": "herramientas-de-costura",
@@ -162,7 +162,7 @@ CROSS_SELL = {
     "herramientas":                     "tijeras-profesionales-para-costura",
     "planchas-a-vapor-industrial":      "herramientas-de-costura",
 
-    # ── G7: Decoración / Manualidades ────────────────────────────────────────
+    # â”€â”€ G7: DecoraciÃ³n / Manualidades â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "bisuteria-y-decoracion":           "lentejuelas-y-strass",
     "bisuteria-decoracion":             "lentejuelas-y-strass",
     "lentejuelas-y-strass":             "bisuteria-y-decoracion",
@@ -178,10 +178,10 @@ CROSS_SELL = {
     "tinturas-pegamentos":              "tinturas",
 }
 
-# Sin match específico → no asignar (evita mezclar catálogo completo)
+# Sin match especÃ­fico â†’ no asignar (evita mezclar catÃ¡logo completo)
 DEFAULT_UPSELL = None
 
-# Colecciones genéricas que no sirven para cross-sell — ignorar al hacer match
+# Colecciones genÃ©ricas que no sirven para cross-sell â€” ignorar al hacer match
 EXCLUDE_FROM_MATCHING = {
     "top-65-favoritos",
     "catalogo-completo",
@@ -193,7 +193,7 @@ EXCLUDE_FROM_MATCHING = {
 }
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+# â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def paginate(path, key, **params):
     items = []
@@ -212,9 +212,9 @@ def paginate(path, key, **params):
     return items
 
 
-# ── Fetch data ─────────────────────────────────────────────────────────────────
+# â”€â”€ Fetch data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-print("🔍 Obteniendo colecciones...")
+print("ðŸ” Obteniendo colecciones...")
 custom_cols = paginate("custom_collections.json", "custom_collections", fields="id,handle,title")
 smart_cols  = paginate("smart_collections.json",  "smart_collections",  fields="id,handle,title")
 all_cols    = custom_cols + smart_cols
@@ -222,13 +222,13 @@ cols_by_handle = {c["handle"]: c for c in all_cols}
 cols_by_id     = {c["id"]: c for c in all_cols}
 print(f"   {len(all_cols)} colecciones")
 
-print("🔍 Obteniendo productos...")
+print("ðŸ” Obteniendo productos...")
 products = paginate("products.json", "products", fields="id,title,handle")
 print(f"   {len(products)} productos")
 
 # collects.json solo cubre colecciones manuales; para smart collections
-# hay que consultar cada colección individualmente.
-print("🔍 Mapeando productos por colección (manual + smart)...")
+# hay que consultar cada colecciÃ³n individualmente.
+print("ðŸ” Mapeando productos por colecciÃ³n (manual + smart)...")
 from collections import defaultdict
 prod_cols: dict[int, list[str]] = defaultdict(list)
 total_rels = 0
@@ -244,27 +244,42 @@ for col in all_cols:
 print(f"   {total_rels} relaciones (manual + smart)")
 
 
-# ── Asignar upsell ─────────────────────────────────────────────────────────────
+# â”€â”€ Asignar upsell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# Override por título: más específico que colección (ej: bordadora dentro de industrial)
+# Override por tÃ­tulo: mÃ¡s especÃ­fico que colecciÃ³n (ej: bordadora dentro de industrial)
 TITLE_OVERRIDES = [
-    # Agujas bordadora → hilos de bordar (no overlock)
+    # Hilos de jeans/tapiceria -> coleccion especifica
+    (["jeans", "tapiceria jeans", "coser jeans", "hilo de pesca"], "hilo-jeans"),
+    # Planchas de aguja, guarda aguja, devanadora, ampolletas -> repuestos
+    (["plancha de aguja", "plancha aguja", "guarda aguja", "devanadora", "ampolleta"], "repuestos-maquinas-de-coser"),
+    # Herramientas pequenas -> repuestos
+    (["llave allen", "pinza de preci", "lubricador", "zurcido", "protector de dedo"], "repuestos-maquinas-de-coser"),
+    # Agujas bordadora -> hilos de bordar
     (["bordadora", "bordado", "dbk"],       "hilos-bordar-profesionales"),
-    # Agujas Schmetz / Singer → caseras
+    # Agujas Schmetz / Singer -> caseras
     (["schmetz", "singer"],                 "hilo-2000"),
-    # Agujas Groz-Beckert → industriales
+    # Agujas Groz-Beckert -> industriales
     (["groz", "beckert", "gb "],            "hilo-overlock"),
-    # Palillos tejido → lanas
+    # Palillos y agujas circulares tejido -> lanas
+    (["palillo", "circular de acero"],      "lanas-ovillos-crochet-tejido"),
+    # Lanas -> tejido
+    (["lana "],                             "lanas-ovillos-crochet-tejido"),
+],       "hilos-bordar-profesionales"),
+    # Agujas Schmetz / Singer â†’ caseras
+    (["schmetz", "singer"],                 "hilo-2000"),
+    # Agujas Groz-Beckert â†’ industriales
+    (["groz", "beckert", "gb "],            "hilo-overlock"),
+    # Palillos tejido â†’ lanas
     (["palillo"],                           "lanas-ovillos-crochet-tejido"),
 ]
 
 def best_upsell_handle(product_id: int, title: str = "") -> str | None:
     t = title.lower()
-    # 1. Override por título (más específico)
+    # 1. Override por tÃ­tulo (mÃ¡s especÃ­fico)
     for keywords, handle in TITLE_OVERRIDES:
         if any(k in t for k in keywords) and handle in cols_by_handle:
             return handle
-    # 2. Por colección con prioridad
+    # 2. Por colecciÃ³n con prioridad
     handles = set(prod_cols.get(product_id, [])) - EXCLUDE_FROM_MATCHING
     ordered = [h for h in PRIORITY if h in handles] + [h for h in handles if h not in PRIORITY]
     for h in ordered:
@@ -276,18 +291,18 @@ def best_upsell_handle(product_id: int, title: str = "") -> str | None:
     return None
 
 
-# Sugerencia de colección para los sin asignar (por palabras en el título)
+# Sugerencia de colecciÃ³n para los sin asignar (por palabras en el tÃ­tulo)
 TITLE_SUGGESTIONS = [
     (["palillo"],                                   "agujas-crochet-y-tejido"),
     (["aceitera", "aceite", "ampolleta", "foco"],   "repuestos-maquinas-de-coser"),
     (["bobina", "lanzadera", "canilla"],             "repuestos-maquinas-de-coser"),
     (["bastidor"],                                   "bastidores-bordado"),
-    (["macramé", "macrame", "cordón trenzado", "cordon trenzado"], "macrame-cordon-trenzado"),
-    (["cordón", "cordon"],                           "cordones-zapatos-costura-manualidades"),
+    (["macramÃ©", "macrame", "cordÃ³n trenzado", "cordon trenzado"], "macrame-cordon-trenzado"),
+    (["cordÃ³n", "cordon"],                           "cordones-zapatos-costura-manualidades"),
     (["tijera", "descosedor"],                       "herramientas-de-costura"),
     (["cinta", "sesgo", "bies"],                     "cierres"),
-    (["elástico", "elastico"],                       "elasticos-costura"),
-    (["botón", "boton"],                             "botones"),
+    (["elÃ¡stico", "elastico"],                       "elasticos-costura"),
+    (["botÃ³n", "boton"],                             "botones"),
     (["hilo overlock", "overlock"],                  "hilo-overlock"),
     (["hilo bordar", "bordar"],                      "hilos-bordar-profesionales"),
     (["hilo"],                                       "hilo-2000"),
@@ -310,7 +325,7 @@ def suggest_by_title(title: str) -> str:
         if any(k in t for k in keywords):
             if handle in cols_by_handle:
                 return handle
-    return "— sin sugerencia —"
+    return "â€” sin sugerencia â€”"
 
 
 plan = []
@@ -322,27 +337,27 @@ for p in products:
     else:
         unmatched.append(p)
 
-print(f"📦 Plan: {len(plan)} productos asignados / {len(unmatched)} sin colección upsell")
+print(f"ðŸ“¦ Plan: {len(plan)} productos asignados / {len(unmatched)} sin colecciÃ³n upsell")
 print()
 
 # Muestra muestra del plan
 for p, col in plan[:40]:
     src_handles = ", ".join(prod_cols.get(p["id"], ["?"]))
-    print(f"   {p['title'][:42]:42s} [{src_handles[:30]}] → {col['handle']}")
+    print(f"   {p['title'][:42]:42s} [{src_handles[:30]}] â†’ {col['handle']}")
 if len(plan) > 40:
-    print(f"   ... y {len(plan)-40} más")
+    print(f"   ... y {len(plan)-40} mÃ¡s")
 print()
 
 if unmatched:
-    print(f"⚠️  Sin asignar ({len(unmatched)}) — agregar a la colección sugerida en Shopify Admin:")
-    print(f"   {'Producto':50s}  {'Colección sugerida'}")
+    print(f"âš ï¸  Sin asignar ({len(unmatched)}) â€” agregar a la colecciÃ³n sugerida en Shopify Admin:")
+    print(f"   {'Producto':50s}  {'ColecciÃ³n sugerida'}")
     print(f"   {'-'*50}  {'-'*35}")
     for p in unmatched:
         suggestion = suggest_by_title(p["title"])
         print(f"   {p['title'][:50]:50s}  {suggestion}")
     print()
 
-# ── Aplicar ────────────────────────────────────────────────────────────────────
+# â”€â”€ Aplicar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dry-run", action="store_true")
@@ -350,10 +365,10 @@ parser.add_argument("--apply",   action="store_true")
 args = parser.parse_args()
 
 if args.dry_run or not args.apply:
-    print("ℹ️  Modo dry-run. Corre con --apply para guardar los cambios.")
+    print("â„¹ï¸  Modo dry-run. Corre con --apply para guardar los cambios.")
     sys.exit(0)
 
-print("🚀 Aplicando metafields...")
+print("ðŸš€ Aplicando metafields...")
 ok = err = 0
 for p, col in plan:
     col_handle = col["handle"]
@@ -374,7 +389,7 @@ for p, col in plan:
             json={"metafield": {"id": mf_id, "value": col_handle, "type": "single_line_text_field"}},
             timeout=30,
         )
-        verb = "↩️ "
+        verb = "â†©ï¸ "
     else:
         r = requests.post(
             f"{REST_BASE}/products/{p['id']}/metafields.json",
@@ -389,16 +404,18 @@ for p, col in plan:
             }},
             timeout=30,
         )
-        verb = "✅ "
+        verb = "âœ… "
 
     if r.status_code in (200, 201):
-        print(f"  {verb}{p['title'][:45]:45s} → {col['handle']}")
+        print(f"  {verb}{p['title'][:45]:45s} â†’ {col['handle']}")
         ok += 1
     else:
-        print(f"  ❌ {p['title'][:45]} — HTTP {r.status_code}: {r.text[:120]}")
+        print(f"  âŒ {p['title'][:45]} â€” HTTP {r.status_code}: {r.text[:120]}")
         err += 1
 
     time.sleep(0.25)
 
 print()
-print(f"✅ {ok} asignados / ❌ {err} errores")
+print(f"âœ… {ok} asignados / âŒ {err} errores")
+
+
