@@ -1,4 +1,4 @@
-﻿name: Audit Diario
+name: Audit Diario
 on:
   schedule:
     - cron: '0 13 * * 1-5'
@@ -9,9 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
+        with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
       - name: Run audits
         env:
@@ -22,11 +20,15 @@ jobs:
           python scripts/audit_404_full.py | tee audit-404.log
           python scripts/audit_collection_intruders.py | tee audit-intruders.log
           python scripts/verify_product_collections.py | tee audit-verify.log
+          python scripts/audit_catalog.py | tee audit-catalog.log
+          python scripts/audit_seo.py | tee audit-seo.log
+          python scripts/audit_collections_health.py | tee audit-collections.log
           fail=0
           grep -qE "TOTAL: [1-9][0-9]* productos potencialmente" audit-intruders.log && fail=1
           grep -qE "RESUMEN: [0-9]+/[0-9]+ OK, [1-9][0-9]* con problemas" audit-404.log && fail=1
-          grep -qE "FALTA agregar a coleccion sugerida: [1-9]" audit-verify.log && fail=1
-          grep -qE "SIN coleccion especifica: +[1-9]" audit-verify.log && fail=1
+          grep -qE "PROBLEMAS CRITICOS: [1-9]" audit-catalog.log && fail=1
+          grep -qE "PROBLEMAS SEO CRITICOS: [1-9]" audit-seo.log && fail=1
+          grep -qE "PROBLEMAS CRITICOS: [1-9]" audit-collections.log && fail=1
           exit $fail
       - uses: actions/upload-artifact@v4
         if: always()
