@@ -1,4 +1,4 @@
-﻿"""
+"""
 Asigna custom.upsell_collection a cada producto basÃ¡ndose en las colecciones
 a las que ya pertenece (no en palabras del tÃ­tulo).
 
@@ -248,29 +248,20 @@ print(f"   {total_rels} relaciones (manual + smart)")
 
 # Override por tÃ­tulo: mÃ¡s especÃ­fico que colecciÃ³n (ej: bordadora dentro de industrial)
 TITLE_OVERRIDES = [
-    # Hilos de jeans/tapiceria -> coleccion especifica
-    (["jeans", "tapiceria jeans", "coser jeans", "hilo de pesca"], "hilo-jeans"),
-    # Planchas de aguja, guarda aguja, devanadora, ampolletas -> repuestos
+    (["jeans", "coser jeans", "hilo de pesca"], "hilo-jeans"),
     (["plancha de aguja", "plancha aguja", "guarda aguja", "devanadora", "ampolleta"], "repuestos-maquinas-de-coser"),
-    # Herramientas pequenas -> repuestos
     (["llave allen", "pinza de preci", "lubricador", "zurcido", "protector de dedo"], "repuestos-maquinas-de-coser"),
-    # Agujas bordadora -> hilos de bordar
-    (["bordadora", "bordado", "dbk"],       "hilos-bordar-profesionales"),
-    # Agujas Schmetz / Singer -> caseras
-    (["schmetz", "singer"],                 "hilo-2000"),
-    # Agujas Groz-Beckert -> industriales
-    (["groz", "beckert", "gb "],            "hilo-overlock"),
-    # Palillos y agujas circulares tejido -> lanas
-    (["palillo", "circular de acero"],      "lanas-ovillos-crochet-tejido"),
-    # Lanas -> tejido
-    (["lana "],                             "lanas-ovillos-crochet-tejido"),
-],       "hilos-bordar-profesionales"),
-    # Agujas Schmetz / Singer â†’ caseras
-    (["schmetz", "singer"],                 "hilo-2000"),
-    # Agujas Groz-Beckert â†’ industriales
-    (["groz", "beckert", "gb "],            "hilo-overlock"),
-    # Palillos tejido â†’ lanas
-    (["palillo"],                           "lanas-ovillos-crochet-tejido"),
+    (["crochet para maquina", "crochet overlock", "crochet siruba"], "repuestos-maquinas-de-coser"),
+    (["correa dentada", "correa para maquina", "cana para prensatela", "guia de hilo"], "repuestos-maquinas-de-coser"),
+    (["bissel", "aguja doble"], "aguja-maquina-casera"),
+    (["f6000", "pegamento para tela", "adhesivo para tela"], "materiales-para-manualidades"),
+    (["bordadora", "bordado", "dbk"], "hilos-bordar-profesionales"),
+    (["schmetz", "singer"], "hilo-2000"),
+    (["groz", "beckert", "gb "], "hilo-overlock"),
+    (["macrame"], "macrame-cordon-trenzado"),
+    (["palillo", "circular de acero"], "lanas-ovillos-crochet-tejido"),
+    (["lana "], "lanas-ovillos-crochet-tejido"),
+    (["hilo coser", "industrial gris"], "hilo-2000"),
 ]
 
 def best_upsell_handle(product_id: int, title: str = "") -> str | None:
