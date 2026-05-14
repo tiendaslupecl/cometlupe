@@ -1,4 +1,4 @@
-﻿"""Auditoria de salud de colecciones."""
+"""Auditoria de salud de colecciones."""
 import sys, time
 from pathlib import Path
 from collections import defaultdict
@@ -38,7 +38,7 @@ for col in published:
     time.sleep(0.1)
 
 print("Cargando upsells...")
-Q = 'query($cursor: String) { products(first: 250, after: $cursor, query: "status:active") { pageInfo { hasNextPage endCursor } nodes { id title metafield(namespace: "custom", key: "upsell_products") { value } } } }'
+Q = 'query($cursor: String) { products(first: 250, after: $cursor, query: "status:active") { pageInfo { hasNextPage endCursor } nodes { id title metafield(namespace: "custom", key: "upsell_collection") { value } } } }'
 cursor, prod_upsell = None, {}
 while True:
     data = graphql(Q, {"cursor": cursor})
